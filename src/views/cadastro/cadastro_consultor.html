@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -31,10 +31,40 @@
                     <label for="dataNascimento" class="form-label">Data de Nascimento</label>
                     <input type="date" class="form-control" id="dataNascimento" required>
                 </div>
-                <button onclick="location.href=('../consultor/inicio.html')" type="submit" class="btn btn-primary w-100">Cadastrar</button>
+                <button type="submit" class="btn btn-primary w-100">Cadastrar</button>
             </form>
+            <p id="mensagem" class="text-center mt-3"></p>
         </div>
     </div>
-    <script src="scripts.js"></script>
+
+    <!-- Adicionando Axios para requisições HTTP -->
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script>
+        document.getElementById('cadastroConsultorForm').addEventListener('submit', function (event) {
+            event.preventDefault(); // Impede o envio padrão do formulário
+
+            // Captura os dados do formulário
+            const dados = {
+                FC_NOME_COMPLETO: document.getElementById('nome').value,
+                FC_EMAIL: document.getElementById('email').value,
+                FC_SENHA: document.getElementById('senha').value,
+                FC_CPF: document.getElementById('cpf').value,
+                FD_DATA_NASCIMENTO: document.getElementById('dataNascimento').value
+            };
+
+            // Envia os dados para o backend
+            axios.post('http://localhost:3000/consultor/cadastrar', dados)
+                .then(response => {
+                    // Exibe mensagem de sucesso
+                    document.getElementById('mensagem').textContent = 'Consultor cadastrado com sucesso!';
+                    document.getElementById('mensagem').style.color = 'green';
+                })
+                .catch(error => {
+                    // Exibe mensagem de erro
+                    document.getElementById('mensagem').textContent = 'Erro ao cadastrar consultor: ' + error.response.data.error;
+                    document.getElementById('mensagem').style.color = 'red';
+                });
+        });
+    </script>
 </body>
 </html>

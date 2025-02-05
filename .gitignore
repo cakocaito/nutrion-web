@@ -1,0 +1,31 @@
+# Ignorar node_modules (dependências do Node.js)
+node_modules/
+
+# Ignorar arquivos de ambiente (credenciais e configurações sensíveis)
+.env
+
+# Ignorar logs
+*.log
+
+# Ignorar arquivos de configuração local
+*.local
+
+# Ignorar diretórios de IDE
+.vscode/
+.idea/
+
+# Ignorar arquivos de sistema
+.DS_Store
+Thumbs.db
+
+# Ignorar arquivos de build (se houver)
+dist/
+build/
+
+# Ignorar arquivos de cache
+.cache/
+.npm/
+.yarn/
+
+# Ignorar arquivos de cobertura de testes (se houver)
+coverage/
