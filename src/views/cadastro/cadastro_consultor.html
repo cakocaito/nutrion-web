@@ -53,11 +53,9 @@
             };
 
             // Envia os dados para o backend
-            axios.post('http://localhost:3000/consultor/cadastrar', dados)
+            axios.post('http://localhost:3000/consultor/cadastrar_consultor', dados)
                 .then(response => {
-                    // Exibe mensagem de sucesso
-                    document.getElementById('mensagem').textContent = 'Consultor cadastrado com sucesso!';
-                    document.getElementById('mensagem').style.color = 'green';
+                    window.location.href = '/consultor/inicio';
                 })
                 .catch(error => {
                     // Exibe mensagem de erro

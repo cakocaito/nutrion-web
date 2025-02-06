@@ -1,11 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Cadastro de Responsável</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
+
 <body>
     <div class="container d-flex justify-content-center align-items-center vh-100">
         <div class="card p-4 shadow" style="width: 400px;">
@@ -39,10 +41,48 @@
                     <label for="cnpj" class="form-label">CNPJ</label>
                     <input type="text" class="form-control" id="cnpj" required>
                 </div>
-                <button onclick="location.href=('../responsavel/inicio.html')" type="submit" class="btn btn-primary w-100">Cadastrar</button>
+                <button type="submit" class="btn btn-primary w-100">Cadastrar</button>
             </form>
+            <div id="mensagem" class="mt-3 text-center"></div>
         </div>
     </div>
-    <script src="scripts.js"></script>
+    <!-- Adicionando Axios para requisições HTTP -->
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script>
+        document.getElementById('cadastroResponsavelForm').addEventListener('submit', function (event) {
+            event.preventDefault(); // Impede o envio padrão do formulário
+
+            // Captura os dados do formulário
+            const dadosResponsavel = {
+                FC_NOME_COMPLETO: document.getElementById('nome').value,
+                FC_EMAIL: document.getElementById('email').value,
+                FC_SENHA: document.getElementById('senha').value,
+                FC_CPF: document.getElementById('cpf').value,
+                FD_DATA_NASCIMENTO: document.getElementById('dataNascimento').value,
+                FC_CNPJ: document.getElementById('cnpj').value
+            };
+
+            const dadosInstituicao = {
+                FC_RAZAO_SOCIAL: document.getElementById('razaoSocial').value,
+                FC_CNPJ: document.getElementById('cnpj').value
+            };
+
+            // Envia os dados do responsável e da instituição simultaneamente
+            axios.all([
+                axios.post('http://localhost:3000/responsavel/cadastrar_responsavel', dadosResponsavel),
+                axios.post('http://localhost:3000/instituicao/cadastrar_instituicao', dadosInstituicao)
+            ])
+            .then(axios.spread((responsavelResponse, instituicaoResponse) => {
+                console.log('Responsável e instituição cadastrados com sucesso!');
+                window.location.href = '/responsavel/inicio';
+            }))
+            .catch(error => {
+                // Exibe mensagem de erro
+                document.getElementById('mensagem').textContent = 'Erro ao cadastrar: ' + (error.response ? error.response.data.error : error.message);
+                document.getElementById('mensagem').style.color = 'red';
+            });
+        });
+    </script>
 </body>
+
 </html>
