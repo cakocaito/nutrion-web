@@ -69,18 +69,19 @@
 
             // Envia os dados do responsável e da instituição simultaneamente
             axios.all([
-                axios.post('http://localhost:3000/responsavel/cadastrar_responsavel', dadosResponsavel),
-                axios.post('http://localhost:3000/instituicao/cadastrar_instituicao', dadosInstituicao)
+                axios.post('http://localhost:3000/instituicao/cadastrar_instituicao', dadosInstituicao),
+                axios.post('http://localhost:3000/responsavel/cadastrar_responsavel', dadosResponsavel)
+
             ])
-            .then(axios.spread((responsavelResponse, instituicaoResponse) => {
-                console.log('Responsável e instituição cadastrados com sucesso!');
-                window.location.href = '/responsavel/inicio';
-            }))
-            .catch(error => {
-                // Exibe mensagem de erro
-                document.getElementById('mensagem').textContent = 'Erro ao cadastrar: ' + (error.response ? error.response.data.error : error.message);
-                document.getElementById('mensagem').style.color = 'red';
-            });
+                .then(axios.spread((responsavelResponse, instituicaoResponse) => {
+                    console.log('Responsável e instituição cadastrados com sucesso!');
+                    window.location.href = '/responsavel/inicio';
+                }))
+                .catch(error => {
+                    // Exibe mensagem de erro
+                    document.getElementById('mensagem').textContent = 'Erro ao cadastrar: ' + (error.response ? error.response.data.error : error.message);
+                    document.getElementById('mensagem').style.color = 'red';
+                });
         });
     </script>
 </body>
