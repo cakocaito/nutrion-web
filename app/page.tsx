@@ -1,65 +1,120 @@
-import Image from "next/image";
+"use client";
 
-export default function Home() {
+import Image from "next/image";
+import { useRouter } from "next/navigation";
+
+export default function Login() {
+  const router = useRouter();
+
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
+    <div className="relative flex min-h-screen flex-col items-center justify-center overflow-hidden bg-[#f1f8fc] px-4 py-8">
+      {/* Background decorative elements */}
+      <div className="pointer-events-none absolute -left-[82px] bottom-0 size-[268px] rounded-full bg-gradient-to-tr from-[#0f62ac]/5 to-transparent blur-3xl" />
+      <div className="pointer-events-none absolute -right-[40px] top-[60px] size-[160px] rounded-full bg-gradient-to-bl from-[#0f62ac]/8 to-transparent blur-3xl" />
+
+      {/* Decorative dashed curves */}
+      <svg
+        className="pointer-events-none absolute right-[40px] top-[100px] hidden h-[400px] w-[200px] lg:block"
+        viewBox="0 0 200 400"
+        fill="none"
+      >
+        <path
+          d="M180 0 C 180 150, 20 150, 20 300 C 20 350, 60 400, 120 400"
+          stroke="#0f62ac"
+          strokeWidth="1.5"
+          strokeDasharray="8 6"
+          opacity="0.2"
         />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
+        <path
+          d="M160 20 C 160 160, 10 170, 30 320"
+          stroke="#0f62ac"
+          strokeWidth="1"
+          strokeDasharray="6 5"
+          opacity="0.15"
+        />
+      </svg>
+
+      {/* Login Card */}
+      <div
+        className="relative z-10 w-full max-w-[520px] rounded-[28px] border border-[#0f62ac]/15 p-8 shadow-[0px_12px_24px_-11px_rgba(187,187,187,0.25)] backdrop-blur-[7px] sm:max-w-[560px] sm:rounded-[35px] sm:p-10 md:p-12"
+        style={{
+          backgroundImage:
+            "linear-gradient(98deg, rgba(255,255,255,0.66) 17%, rgba(255,255,255,0.26) 99%)",
+        }}
+      >
+        {/* Header */}
+        <div className="flex items-center gap-3">
+          <div className="flex size-[50px] items-center justify-center rounded-md bg-[#0f62ac] sm:size-[60px]">
             <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
+              src="/images/uff-logo.png"
+              alt="Navio Escola"
+              width={44}
+              height={22}
+              className="h-[20px] w-[40px] object-contain brightness-0 invert sm:h-[27px] sm:w-[54px]"
             />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+          </div>
+          <div>
+            <h1 className="font-[family-name:var(--font-heading)] text-[20px] font-bold tracking-tight text-black sm:text-[24px]">
+              Navio Escola
+            </h1>
+            <p className="text-[14px] font-medium text-black/60 sm:text-[16px]">
+              Crie uma conta ou faça login
+            </p>
+          </div>
         </div>
-      </main>
+
+        {/* Form */}
+        <div className="mt-8 sm:mt-10">
+          <h2 className="font-[family-name:var(--font-heading)] text-[20px] font-bold tracking-tight text-black sm:text-[24px]">
+            Entrar
+          </h2>
+
+          <div className="mt-5 flex flex-col gap-4 sm:mt-6 sm:gap-5">
+            <input
+              type="email"
+              placeholder="Continuar com o endereço de e-mail"
+              className="h-[50px] w-full rounded-full border border-[#9e9e9e]/24 bg-white px-6 text-[15px] font-medium text-[#2e2e2e] placeholder-[#a3b5bf] outline-none transition-colors focus:border-[#0f62ac]/40 sm:h-[55px] sm:text-[17px]"
+            />
+
+            <input
+              type="password"
+              placeholder="Senha"
+              className="h-[50px] w-full rounded-full border border-[#9e9e9e]/24 bg-white px-6 text-[15px] font-medium text-[#2e2e2e] placeholder-[#a3b5bf] outline-none transition-colors focus:border-[#0f62ac]/40 sm:h-[55px] sm:text-[17px]"
+            />
+
+            <button
+              onClick={() => router.push("/cadastro")}
+              className="h-[50px] w-full rounded-full border border-[#9e9e9e]/24 bg-white text-[15px] font-semibold text-[#a3b5bf] transition-colors hover:border-[#0f62ac]/30 hover:text-[#0f62ac] sm:h-[55px] sm:text-[17px]"
+            >
+              Continuar
+            </button>
+          </div>
+        </div>
+
+        {/* Create Account */}
+        <div className="mt-10 flex flex-col items-center sm:mt-14">
+          <div className="mb-6 h-px w-full bg-[#9e9e9e]/15 sm:mb-8" />
+          <button
+            onClick={() => router.push("/cadastro")}
+            className="inline-flex h-[46px] w-[200px] items-center justify-center rounded-full bg-[#0f62ac] text-[14px] font-semibold text-white transition-colors hover:bg-[#0f62ac]/90 sm:h-[50px] sm:w-[226px] sm:text-[15px]"
+          >
+            Criar conta
+          </button>
+        </div>
+      </div>
+
+      {/* Footer Terms */}
+      <p className="relative z-10 mt-8 max-w-[500px] text-center text-[12px] font-medium leading-relaxed text-black/60 sm:mt-10 sm:text-[14px]">
+        Ao iniciar sua conta, você deve aceitar os{" "}
+        <a href="#termos" className="text-[#0f62ac] hover:underline">
+          Termos de Privacidade
+        </a>{" "}
+        e os{" "}
+        <a href="#uso" className="text-[#0f62ac] hover:underline">
+          Termos de Uso
+        </a>{" "}
+        do nosso serviço.
+      </p>
     </div>
   );
 }
