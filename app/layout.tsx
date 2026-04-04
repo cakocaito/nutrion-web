@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Instrument_Sans, Plus_Jakarta_Sans } from "next/font/google";
+import { AuthProvider } from "@/context/AuthContext";
 import "./globals.css";
 
 const instrumentSans = Instrument_Sans({
@@ -30,7 +31,7 @@ export default function RootLayout({
       <body
         className={`${instrumentSans.variable} ${plusJakarta.variable} antialiased`}
       >
-        {children}
+        <AuthProvider>{children}</AuthProvider>
       </body>
     </html>
   );
