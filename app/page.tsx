@@ -1,18 +1,46 @@
 "use client";
 
 import Image from "next/image";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { login } from "@/lib/auth";
+import { useAuth } from "@/context/AuthContext";
 
 export default function Login() {
   const router = useRouter();
+  const { setUser } = useAuth();
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  async function handleLogin() {
+    setError("");
+    if (!email || !password) {
+      setError("Preencha o e-mail e a senha.");
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const user = await login(email, password);
+      setUser(user);
+
+      if (user.role === "Consultor") router.push("/principal/consultor");
+      else if (user.role === "Responsavel") router.push("/principal/responsavel");
+      else router.push("/principal/consultor");
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : "Erro ao fazer login.");
+    } finally {
+      setLoading(false);
+    }
+  }
 
   return (
     <div className="relative flex min-h-screen flex-col items-center justify-center overflow-hidden bg-[#f1f8fc] px-4 py-8">
-      {/* Background decorative elements */}
       <div className="pointer-events-none absolute -left-[82px] bottom-0 size-[268px] rounded-full bg-gradient-to-tr from-[#0f62ac]/5 to-transparent blur-3xl" />
       <div className="pointer-events-none absolute -right-[40px] top-[60px] size-[160px] rounded-full bg-gradient-to-bl from-[#0f62ac]/8 to-transparent blur-3xl" />
 
-      {/* Decorative dashed curves */}
       <svg
         className="pointer-events-none absolute right-[40px] top-[100px] hidden h-[400px] w-[200px] lg:block"
         viewBox="0 0 200 400"
@@ -34,7 +62,6 @@ export default function Login() {
         />
       </svg>
 
-      {/* Login Card */}
       <div
         className="relative z-10 w-full max-w-[520px] rounded-[28px] border border-[#0f62ac]/15 p-8 shadow-[0px_12px_24px_-11px_rgba(187,187,187,0.25)] backdrop-blur-[7px] sm:max-w-[560px] sm:rounded-[35px] sm:p-10 md:p-12"
         style={{
@@ -42,7 +69,6 @@ export default function Login() {
             "linear-gradient(98deg, rgba(255,255,255,0.66) 17%, rgba(255,255,255,0.26) 99%)",
         }}
       >
-        {/* Header */}
         <div className="flex items-center gap-3">
           <div className="flex size-[50px] items-center justify-center rounded-md bg-[#0f62ac] sm:size-[60px]">
             <Image
@@ -63,7 +89,6 @@ export default function Login() {
           </div>
         </div>
 
-        {/* Form */}
         <div className="mt-8 sm:mt-10">
           <h2 className="font-[family-name:var(--font-heading)] text-[20px] font-bold tracking-tight text-black sm:text-[24px]">
             Entrar
@@ -73,25 +98,34 @@ export default function Login() {
             <input
               type="email"
               placeholder="Continuar com o endereço de e-mail"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
               className="h-[50px] w-full rounded-full border border-[#9e9e9e]/24 bg-white px-6 text-[15px] font-medium text-[#2e2e2e] placeholder-[#a3b5bf] outline-none transition-colors focus:border-[#0f62ac]/40 sm:h-[55px] sm:text-[17px]"
             />
 
             <input
               type="password"
               placeholder="Senha"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              onKeyDown={(e) => e.key === "Enter" && handleLogin()}
               className="h-[50px] w-full rounded-full border border-[#9e9e9e]/24 bg-white px-6 text-[15px] font-medium text-[#2e2e2e] placeholder-[#a3b5bf] outline-none transition-colors focus:border-[#0f62ac]/40 sm:h-[55px] sm:text-[17px]"
             />
 
+            {error && (
+              <p className="px-2 text-[13px] font-medium text-red-500">{error}</p>
+            )}
+
             <button
-              onClick={() => router.push("/cadastro")}
-              className="h-[50px] w-full rounded-full border border-[#9e9e9e]/24 bg-white text-[15px] font-semibold text-[#a3b5bf] transition-colors hover:border-[#0f62ac]/30 hover:text-[#0f62ac] sm:h-[55px] sm:text-[17px]"
+              onClick={handleLogin}
+              disabled={loading}
+              className="h-[50px] w-full rounded-full border border-[#9e9e9e]/24 bg-white text-[15px] font-semibold text-[#a3b5bf] transition-colors hover:border-[#0f62ac]/30 hover:text-[#0f62ac] disabled:opacity-50 sm:h-[55px] sm:text-[17px]"
             >
-              Continuar
+              {loading ? "Entrando..." : "Continuar"}
             </button>
           </div>
         </div>
 
-        {/* Create Account */}
         <div className="mt-10 flex flex-col items-center sm:mt-14">
           <div className="mb-6 h-px w-full bg-[#9e9e9e]/15 sm:mb-8" />
           <button
@@ -103,7 +137,6 @@ export default function Login() {
         </div>
       </div>
 
-      {/* Footer Terms */}
       <p className="relative z-10 mt-8 max-w-[500px] text-center text-[12px] font-medium leading-relaxed text-black/60 sm:mt-10 sm:text-[14px]">
         Ao iniciar sua conta, você deve aceitar os{" "}
         <a href="#termos" className="text-[#0f62ac] hover:underline">
