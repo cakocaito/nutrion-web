@@ -231,7 +231,7 @@ export function Sidebar({
         </div>
         {!collapsed && (
           <span className="font-[family-name:var(--font-heading)] text-[15px] font-bold text-[#2e2e2e]">
-            Navio Escola
+            NutriSec
           </span>
         )}
       </div>
@@ -343,7 +343,7 @@ export function MobileSidebar({
             <span className="text-xs font-bold text-white">uff</span>
           </div>
           <span className="font-[family-name:var(--font-heading)] text-[15px] font-bold text-[#2e2e2e]">
-            Navio Escola
+            NutriSec
           </span>
         </div>
 

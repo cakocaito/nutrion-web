@@ -73,7 +73,7 @@ export default function Login() {
           <div className="flex size-[50px] items-center justify-center rounded-md bg-[#0f62ac] sm:size-[60px]">
             <Image
               src="/images/uff-logo.png"
-              alt="Navio Escola"
+              alt="NutriSec"
               width={44}
               height={22}
               className="h-[20px] w-[40px] object-contain brightness-0 invert sm:h-[27px] sm:w-[54px]"
@@ -81,7 +81,7 @@ export default function Login() {
           </div>
           <div>
             <h1 className="font-[family-name:var(--font-heading)] text-[20px] font-bold tracking-tight text-black sm:text-[24px]">
-              Navio Escola
+              NutriSec
             </h1>
             <p className="text-[14px] font-medium text-black/60 sm:text-[16px]">
               Crie uma conta ou faça login
