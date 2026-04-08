@@ -2,6 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { useAuth } from "@/context/AuthContext";
 
 /* ───── Icons ───── */
 
@@ -219,6 +220,12 @@ export function Sidebar({
   onToggle: () => void;
 }) {
   const router = useRouter();
+  const { logout } = useAuth();
+
+  function handleLogout() {
+    logout();
+    router.push("/");
+  }
 
   return (
     <aside
@@ -249,32 +256,18 @@ export function Sidebar({
           icon={<BranchIcon />}
           label="Projetos"
           collapsed={collapsed}
-        />
-        <SidebarItem
-          icon={<WorkIcon />}
-          label="Atividades"
-          collapsed={collapsed}
-        />
-        <SidebarItem
-          icon={<PlusIcon />}
-          label="Novo projeto"
-          collapsed={collapsed}
+          onClick={() => router.push(`/projeto/${role}`)}
         />
       </nav>
 
       {/* Bottom Items */}
       <div className="mb-4 flex flex-col gap-1 border-t border-[#0f62ac]/10 px-3 pt-4">
         <SidebarItem
-          icon={<SettingsIcon />}
-          label="Configurações"
-          collapsed={collapsed}
-        />
-        <SidebarItem
           icon={<LogoutIcon />}
           label="Sair"
           collapsed={collapsed}
           danger
-          onClick={() => router.push("/")}
+          onClick={handleLogout}
         />
       </div>
     </aside>
@@ -326,6 +319,12 @@ export function MobileSidebar({
   onClose: () => void;
 }) {
   const router = useRouter();
+  const { logout } = useAuth();
+
+  function handleLogout() {
+    logout();
+    router.push("/");
+  }
 
   if (!open) return null;
 
@@ -354,7 +353,7 @@ export function MobileSidebar({
             active
             collapsed={false}
             onClick={() => {
-              router.push("/principal");
+              router.push(`/principal/${role}`);
               onClose();
             }}
           />
@@ -362,31 +361,20 @@ export function MobileSidebar({
             icon={<BranchIcon />}
             label="Projetos"
             collapsed={false}
-          />
-          <SidebarItem
-            icon={<WorkIcon />}
-            label="Atividades"
-            collapsed={false}
-          />
-          <SidebarItem
-            icon={<PlusIcon />}
-            label="Novo projeto"
-            collapsed={false}
+            onClick={() => {
+              router.push(`/projeto/${role}`);
+              onClose();
+            }}
           />
         </nav>
 
         <div className="mb-4 flex flex-col gap-1 border-t border-[#0f62ac]/10 px-3 pt-4">
           <SidebarItem
-            icon={<SettingsIcon />}
-            label="Configurações"
-            collapsed={false}
-          />
-          <SidebarItem
             icon={<LogoutIcon />}
             label="Sair"
             collapsed={false}
             danger
-            onClick={() => router.push("/")}
+            onClick={handleLogout}
           />
         </div>
       </aside>
