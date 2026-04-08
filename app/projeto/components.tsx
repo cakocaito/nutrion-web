@@ -446,12 +446,13 @@ export function TopBar({
 /* ───── Project Card ───── */
 
 export function ProjectCard({
+  id,
   title,
   institution,
   status,
   date,
-  members,
 }: {
+  id?: number;
   title: string;
   institution: string;
   status: "em_andamento" | "concluido" | "pendente";
@@ -488,7 +489,11 @@ export function ProjectCard({
       </div>
       <div className="mt-4 flex items-center justify-between text-[12px] text-[#6b7280]">
         <span>{date}</span>
-        <span>{members} membro{members > 1 ? "s" : ""}</span>
+        {status === "pendente" && id && (
+          <span className="rounded-md bg-[#f1f8fc] px-2 py-0.5 font-mono font-semibold text-[#0f62ac]">
+            id_pesquisa: {id}
+          </span>
+        )}
       </div>
     </div>
   );

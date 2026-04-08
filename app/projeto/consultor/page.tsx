@@ -47,6 +47,8 @@ function NovaAvaliacaoModal({
   const [buscando, setBuscando] = useState(false);
   const [salvando, setSalvando] = useState(false);
   const [erro, setErro] = useState<string | null>(null);
+  const [codigoCriado, setCodigoCriado] = useState<number | null>(null);
+  const [copiado, setCopiado] = useState(false);
 
   async function buscarEstabelecimento() {
     if (!cnpj.trim()) return;
@@ -71,7 +73,7 @@ function NovaAvaliacaoModal({
     setSalvando(true);
     setErro(null);
     try {
-      await apiFetch("/api/avaliacoes", {
+      const data = await apiFetch("/api/avaliacoes", {
         method: "POST",
         body: JSON.stringify({
           estabelecimentoId: estabelecimento.id,
@@ -79,12 +81,60 @@ function NovaAvaliacaoModal({
         }),
       });
       onCriada();
-      onClose();
+      setCodigoCriado(data.id);
     } catch (e: unknown) {
       setErro(e instanceof Error ? e.message : "Erro ao criar avaliação.");
     } finally {
       setSalvando(false);
     }
+  }
+
+  function copiarCodigo() {
+    if (codigoCriado) {
+      navigator.clipboard.writeText(String(codigoCriado));
+      setCopiado(true);
+      setTimeout(() => setCopiado(false), 2000);
+    }
+  }
+
+  // Tela de confirmação após criar
+  if (codigoCriado) {
+    return (
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
+        <div className="w-full max-w-[440px] rounded-2xl bg-white p-6 shadow-xl text-center">
+          <div className="mx-auto mb-4 flex size-[48px] items-center justify-center rounded-full bg-emerald-100">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#059669" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <polyline points="20 6 9 17 4 12" />
+            </svg>
+          </div>
+          <h2 className="font-[family-name:var(--font-heading)] text-[18px] font-bold text-[#2e2e2e]">
+            Avaliação criada!
+          </h2>
+          <p className="mt-2 text-[13px] text-[#6b7280]">
+            Use o código abaixo no campo <strong>id_pesquisa</strong> do REDCap durante a vistoria.
+          </p>
+          <div className="mt-5 rounded-xl border-2 border-dashed border-[#0f62ac]/30 bg-[#f1f8fc] py-4">
+            <p className="font-[family-name:var(--font-heading)] text-[36px] font-bold tracking-widest text-[#0f62ac]">
+              {codigoCriado}
+            </p>
+          </div>
+          <div className="mt-5 flex gap-3">
+            <button
+              onClick={copiarCodigo}
+              className="h-[40px] flex-1 rounded-full border border-[#0f62ac]/30 text-[13px] font-semibold text-[#0f62ac] transition-colors hover:bg-[#0f62ac]/5"
+            >
+              {copiado ? "Copiado!" : "Copiar código"}
+            </button>
+            <button
+              onClick={onClose}
+              className="h-[40px] flex-1 rounded-full bg-[#0f62ac] text-[13px] font-semibold text-white transition-colors hover:bg-[#0f62ac]/90"
+            >
+              Fechar
+            </button>
+          </div>
+        </div>
+      </div>
+    );
   }
 
   return (
@@ -260,6 +310,7 @@ export default function ProjetoConsultor() {
             {avaliacoes.map((a) => (
               <ProjectCard
                 key={a.id}
+                id={a.id}
                 title={a.estabelecimentoNome}
                 institution={a.estabelecimentoOrganizacao ?? "—"}
                 status={mapStatus(a.status)}
