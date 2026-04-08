@@ -254,7 +254,7 @@ export function Sidebar({
         />
         <SidebarItem
           icon={<BranchIcon />}
-          label="Projetos"
+          label="Avaliações"
           collapsed={collapsed}
           onClick={() => router.push(`/projeto/${role}`)}
         />
@@ -359,7 +359,7 @@ export function MobileSidebar({
           />
           <SidebarItem
             icon={<BranchIcon />}
-            label="Projetos"
+            label="Avaliações"
             collapsed={false}
             onClick={() => {
               router.push(`/projeto/${role}`);

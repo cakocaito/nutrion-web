@@ -3,6 +3,7 @@
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { useAuth } from "@/context/AuthContext";
 
 const navLinks = [
   { label: "Sobre", href: "#sobre" },
@@ -12,7 +13,13 @@ const navLinks = [
 
 export default function PrincipalConsultor() {
   const router = useRouter();
+  const { logout } = useAuth();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+  function handleLogout() {
+    logout();
+    router.push("/");
+  }
 
   return (
     <div className="relative min-h-screen overflow-hidden bg-[#f1f8fc]">
@@ -42,7 +49,7 @@ export default function PrincipalConsultor() {
             </a>
           ))}
           <button
-            onClick={() => router.push("/")}
+            onClick={handleLogout}
             className="text-[15px] font-semibold tracking-tight text-[#f25050] transition-colors hover:text-[#f25050]/80 lg:text-[17px]"
           >
             Sair
@@ -68,7 +75,7 @@ export default function PrincipalConsultor() {
               {link.label}
             </a>
           ))}
-          <button onClick={() => router.push("/")} className="text-left text-base font-semibold text-[#f25050]">
+          <button onClick={handleLogout} className="text-left text-base font-semibold text-[#f25050]">
             Sair
           </button>
         </nav>
