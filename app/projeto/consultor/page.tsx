@@ -19,6 +19,13 @@ interface Avaliacao {
   temRelatorio: boolean;
 }
 
+interface Estabelecimento {
+  id: number;
+  nome: string;
+  cnpj: string;
+  empresaNome: string | null;
+}
+
 function mapStatus(status: Avaliacao["status"]): "pendente" | "em_andamento" | "concluido" {
   switch (status) {
     case "Concluida": return "concluido";
@@ -27,22 +34,168 @@ function mapStatus(status: Avaliacao["status"]): "pendente" | "em_andamento" | "
   }
 }
 
+function NovaAvaliacaoModal({
+  onClose,
+  onCriada,
+}: {
+  onClose: () => void;
+  onCriada: () => void;
+}) {
+  const [cnpj, setCnpj] = useState("");
+  const [estabelecimento, setEstabelecimento] = useState<Estabelecimento | null>(null);
+  const [dataAgendada, setDataAgendada] = useState("");
+  const [buscando, setBuscando] = useState(false);
+  const [salvando, setSalvando] = useState(false);
+  const [erro, setErro] = useState<string | null>(null);
+
+  async function buscarEstabelecimento() {
+    if (!cnpj.trim()) return;
+    setBuscando(true);
+    setErro(null);
+    try {
+      const data = await apiFetch(`/api/estabelecimentos/buscar?cnpj=${cnpj.trim()}`);
+      setEstabelecimento(data);
+    } catch {
+      setErro("Estabelecimento não encontrado.");
+      setEstabelecimento(null);
+    } finally {
+      setBuscando(false);
+    }
+  }
+
+  async function salvar() {
+    if (!estabelecimento || !dataAgendada) {
+      setErro("Preencha todos os campos.");
+      return;
+    }
+    setSalvando(true);
+    setErro(null);
+    try {
+      await apiFetch("/api/avaliacoes", {
+        method: "POST",
+        body: JSON.stringify({
+          estabelecimentoId: estabelecimento.id,
+          dataAgendada,
+        }),
+      });
+      onCriada();
+      onClose();
+    } catch (e: unknown) {
+      setErro(e instanceof Error ? e.message : "Erro ao criar avaliação.");
+    } finally {
+      setSalvando(false);
+    }
+  }
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
+      <div className="w-full max-w-[440px] rounded-2xl bg-white p-6 shadow-xl">
+        <h2 className="font-[family-name:var(--font-heading)] text-[18px] font-bold text-[#2e2e2e]">
+          Nova avaliação
+        </h2>
+        <p className="mt-1 text-[13px] text-[#6b7280]">
+          Busque o estabelecimento pelo CNPJ e defina a data.
+        </p>
+
+        <div className="mt-5 flex flex-col gap-4">
+          {/* CNPJ */}
+          <div>
+            <label className="mb-1.5 block text-[13px] font-semibold text-[#2e2e2e]">
+              CNPJ do estabelecimento
+            </label>
+            <div className="flex gap-2">
+              <input
+                type="text"
+                placeholder="00.000.000/0000-00"
+                value={cnpj}
+                onChange={(e) => setCnpj(e.target.value)}
+                className="h-[40px] flex-1 rounded-lg border border-[#9e9e9e]/30 px-3 text-[14px] text-[#2e2e2e] outline-none focus:border-[#0f62ac]/50"
+              />
+              <button
+                onClick={buscarEstabelecimento}
+                disabled={buscando}
+                className="h-[40px] rounded-lg bg-[#0f62ac]/10 px-4 text-[13px] font-semibold text-[#0f62ac] transition-colors hover:bg-[#0f62ac]/20 disabled:opacity-50"
+              >
+                {buscando ? "..." : "Buscar"}
+              </button>
+            </div>
+          </div>
+
+          {/* Estabelecimento encontrado */}
+          {estabelecimento && (
+            <div className="rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-3">
+              <p className="text-[14px] font-semibold text-emerald-700">{estabelecimento.nome}</p>
+              {estabelecimento.empresaNome && (
+                <p className="text-[12px] text-emerald-600">{estabelecimento.empresaNome}</p>
+              )}
+            </div>
+          )}
+
+          {/* Data */}
+          <div>
+            <label className="mb-1.5 block text-[13px] font-semibold text-[#2e2e2e]">
+              Data agendada
+            </label>
+            <input
+              type="date"
+              value={dataAgendada}
+              onChange={(e) => setDataAgendada(e.target.value)}
+              className="h-[40px] w-full rounded-lg border border-[#9e9e9e]/30 px-3 text-[14px] text-[#2e2e2e] outline-none focus:border-[#0f62ac]/50"
+            />
+          </div>
+
+          {erro && <p className="text-[13px] text-[#f25050]">{erro}</p>}
+        </div>
+
+        <div className="mt-6 flex gap-3">
+          <button
+            onClick={onClose}
+            className="h-[40px] flex-1 rounded-full border border-[#9e9e9e]/30 text-[13px] font-semibold text-[#6b7280] transition-colors hover:bg-gray-50"
+          >
+            Cancelar
+          </button>
+          <button
+            onClick={salvar}
+            disabled={salvando || !estabelecimento}
+            className="h-[40px] flex-1 rounded-full bg-[#0f62ac] text-[13px] font-semibold text-white transition-colors hover:bg-[#0f62ac]/90 disabled:opacity-50"
+          >
+            {salvando ? "Criando..." : "Criar avaliação"}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function ProjetoConsultor() {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [avaliacoes, setAvaliacoes] = useState<Avaliacao[]>([]);
   const [loading, setLoading] = useState(true);
   const [erro, setErro] = useState<string | null>(null);
+  const [modalAberto, setModalAberto] = useState(false);
 
-  useEffect(() => {
+  function carregarAvaliacoes() {
+    setLoading(true);
     apiFetch("/api/avaliacoes")
       .then(setAvaliacoes)
       .catch((e) => setErro(e.message))
       .finally(() => setLoading(false));
+  }
+
+  useEffect(() => {
+    carregarAvaliacoes();
   }, []);
 
   return (
     <div className="flex min-h-screen bg-[#f8fafb]">
+      {modalAberto && (
+        <NovaAvaliacaoModal
+          onClose={() => setModalAberto(false)}
+          onCriada={carregarAvaliacoes}
+        />
+      )}
+
       {/* Desktop Sidebar */}
       <div className="hidden lg:block">
         <Sidebar
@@ -84,7 +237,10 @@ export default function ProjetoConsultor() {
                 <FilterIcon />
                 Filtros
               </button>
-              <button className="inline-flex h-[38px] items-center gap-2 rounded-full bg-[#0f62ac] px-5 text-[13px] font-semibold text-white transition-colors hover:bg-[#0f62ac]/90">
+              <button
+                onClick={() => setModalAberto(true)}
+                className="inline-flex h-[38px] items-center gap-2 rounded-full bg-[#0f62ac] px-5 text-[13px] font-semibold text-white transition-colors hover:bg-[#0f62ac]/90"
+              >
                 + Nova avaliação
               </button>
             </div>
