@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Sidebar,
   MobileSidebar,
@@ -8,55 +8,38 @@ import {
   ProjectCard,
   FilterIcon,
 } from "../components";
+import { apiFetch } from "@/lib/api";
 
-const projects = [
-  {
-    title: "Avaliação RU Gragoatá",
-    institution: "UFF — Niterói",
-    status: "em_andamento" as const,
-    date: "Mar 2026",
-    members: 4,
-  },
-  {
-    title: "Avaliação RU Valonguinho",
-    institution: "UFF — Niterói",
-    status: "em_andamento" as const,
-    date: "Fev 2026",
-    members: 3,
-  },
-  {
-    title: "Avaliação Bandejão Central",
-    institution: "UFRJ — Fundão",
-    status: "concluido" as const,
-    date: "Jan 2026",
-    members: 5,
-  },
-  {
-    title: "Avaliação Refeitório CT",
-    institution: "UFRJ — Fundão",
-    status: "pendente" as const,
-    date: "Mar 2026",
-    members: 2,
-  },
-  {
-    title: "Avaliação RU Praia Vermelha",
-    institution: "UFF — Niterói",
-    status: "concluido" as const,
-    date: "Dez 2025",
-    members: 4,
-  },
-  {
-    title: "Avaliação Cantina Letras",
-    institution: "UFRJ — Fundão",
-    status: "pendente" as const,
-    date: "Mar 2026",
-    members: 3,
-  },
-];
+interface Avaliacao {
+  id: number;
+  status: "Agendada" | "EmAndamento" | "Concluida" | "Cancelada";
+  dataAgendada: string;
+  estabelecimentoNome: string;
+  estabelecimentoOrganizacao: string | null;
+  temRelatorio: boolean;
+}
+
+function mapStatus(status: Avaliacao["status"]): "pendente" | "em_andamento" | "concluido" {
+  switch (status) {
+    case "Concluida": return "concluido";
+    case "EmAndamento": return "em_andamento";
+    default: return "pendente";
+  }
+}
 
 export default function ProjetoConsultor() {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [avaliacoes, setAvaliacoes] = useState<Avaliacao[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [erro, setErro] = useState<string | null>(null);
+
+  useEffect(() => {
+    apiFetch("/api/avaliacoes")
+      .then(setAvaliacoes)
+      .catch((e) => setErro(e.message))
+      .finally(() => setLoading(false));
+  }, []);
 
   return (
     <div className="flex min-h-screen bg-[#f8fafb]">
@@ -109,8 +92,24 @@ export default function ProjetoConsultor() {
 
           {/* Project Grid */}
           <div className="mt-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-            {projects.map((project) => (
-              <ProjectCard key={project.title} {...project} />
+            {loading && (
+              <p className="text-[14px] text-[#6b7280]">Carregando avaliações...</p>
+            )}
+            {erro && (
+              <p className="text-[14px] text-[#f25050]">{erro}</p>
+            )}
+            {!loading && !erro && avaliacoes.length === 0 && (
+              <p className="text-[14px] text-[#6b7280]">Nenhuma avaliação encontrada.</p>
+            )}
+            {avaliacoes.map((a) => (
+              <ProjectCard
+                key={a.id}
+                title={a.estabelecimentoNome}
+                institution={a.estabelecimentoOrganizacao ?? "—"}
+                status={mapStatus(a.status)}
+                date={new Date(a.dataAgendada).toLocaleDateString("pt-BR", { month: "short", year: "numeric" })}
+                members={0}
+              />
             ))}
           </div>
         </main>
