@@ -9,6 +9,7 @@ import {
   FilterIcon,
 } from "../components";
 import { apiFetch } from "@/lib/api";
+import { maskCNPJ, validateCNPJ, validateDataAgendada } from "@/lib/validators";
 
 interface Avaliacao {
   id: number;
@@ -51,11 +52,15 @@ function NovaAvaliacaoModal({
   const [copiado, setCopiado] = useState(false);
 
   async function buscarEstabelecimento() {
-    if (!cnpj.trim()) return;
-    setBuscando(true);
     setErro(null);
+    const cnpjErr = validateCNPJ(cnpj);
+    if (cnpjErr) {
+      setErro(cnpjErr);
+      return;
+    }
+    setBuscando(true);
     try {
-      const data = await apiFetch(`/api/estabelecimentos/buscar?cnpj=${cnpj.trim()}`);
+      const data = await apiFetch(`/api/estabelecimentos/buscar?cnpj=${cnpj.replace(/\D/g, "")}`);
       setEstabelecimento(data);
     } catch {
       setErro("Estabelecimento não encontrado.");
@@ -66,8 +71,13 @@ function NovaAvaliacaoModal({
   }
 
   async function salvar() {
-    if (!estabelecimento || !dataAgendada) {
-      setErro("Preencha todos os campos.");
+    if (!estabelecimento) {
+      setErro("Busque um estabelecimento pelo CNPJ.");
+      return;
+    }
+    const dataErr = validateDataAgendada(dataAgendada);
+    if (dataErr) {
+      setErro(dataErr);
       return;
     }
     setSalvando(true);
@@ -158,7 +168,7 @@ function NovaAvaliacaoModal({
                 type="text"
                 placeholder="00.000.000/0000-00"
                 value={cnpj}
-                onChange={(e) => setCnpj(e.target.value)}
+                onChange={(e) => setCnpj(maskCNPJ(e.target.value))}
                 className="h-[40px] flex-1 rounded-lg border border-[#9e9e9e]/30 px-3 text-[14px] text-[#2e2e2e] outline-none focus:border-[#0f62ac]/50"
               />
               <button

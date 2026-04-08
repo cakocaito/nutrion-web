@@ -5,6 +5,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { login } from "@/lib/auth";
 import { useAuth } from "@/context/AuthContext";
+import { validateEmail, validatePassword } from "@/lib/validators";
 
 export default function Login() {
   const router = useRouter();
@@ -16,10 +17,10 @@ export default function Login() {
 
   async function handleLogin() {
     setError("");
-    if (!email || !password) {
-      setError("Preencha o e-mail e a senha.");
-      return;
-    }
+    const emailErr = validateEmail(email);
+    if (emailErr) { setError(emailErr); return; }
+    const passErr = validatePassword(password);
+    if (passErr) { setError(passErr); return; }
 
     setLoading(true);
     try {

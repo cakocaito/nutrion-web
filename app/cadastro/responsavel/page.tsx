@@ -1,13 +1,41 @@
 "use client";
 
 import Image from "next/image";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { register } from "@/lib/register";
+import { register, getEstabelecimentos } from "@/lib/register";
+import {
+  maskCPF,
+  validateCPF,
+  validateEmail,
+  validatePassword,
+  validateNome,
+  validateDataNascimento,
+  validateRequired,
+} from "@/lib/validators";
 
 const inputClass =
   "h-[50px] w-full rounded-full border border-[#9e9e9e]/24 bg-white px-6 text-[15px] font-medium text-[#2e2e2e] placeholder-[#a3b5bf] outline-none transition-colors focus:border-[#0f62ac]/40 sm:h-[55px] sm:text-[17px]";
 
+const inputErrorClass =
+  "h-[50px] w-full rounded-full border border-red-400 bg-white px-6 text-[15px] font-medium text-[#2e2e2e] placeholder-[#a3b5bf] outline-none transition-colors focus:border-red-500 sm:h-[55px] sm:text-[17px]";
+
+const selectClass =
+  "h-[50px] w-full appearance-none rounded-full border border-[#9e9e9e]/24 bg-white px-6 pr-12 text-[15px] font-medium text-[#a3b5bf] outline-none transition-colors focus:border-[#0f62ac]/40 sm:h-[55px] sm:text-[17px]";
+
+const selectErrorClass =
+  "h-[50px] w-full appearance-none rounded-full border border-red-400 bg-white px-6 pr-12 text-[15px] font-medium text-[#a3b5bf] outline-none transition-colors focus:border-red-500 sm:h-[55px] sm:text-[17px]";
+
+const chevron = (
+  <svg className="pointer-events-none absolute right-5 top-1/2 -translate-y-1/2 text-[#a3b5bf]" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M6 9l6 6 6-6" />
+  </svg>
+);
+
+function FieldError({ msg }: { msg?: string }) {
+  if (!msg) return null;
+  return <p className="-mt-2 px-6 text-[12px] font-medium text-red-500">{msg}</p>;
+}
 
 export default function CadastroResponsavel() {
   const router = useRouter();
@@ -19,24 +47,58 @@ export default function CadastroResponsavel() {
     email: "",
     password: "",
     confirmPassword: "",
+    estabelecimentoId: "",
   });
+  const [estabelecimentos, setEstabelecimentos] = useState<{ id: number; nome: string }[]>([]);
+  const [errors, setErrors] = useState<Record<string, string>>({});
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
+  useEffect(() => {
+    getEstabelecimentos().then(setEstabelecimentos).catch(() => {});
+  }, []);
+
   function set(field: string, value: string) {
     setForm((f) => ({ ...f, [field]: value }));
+    setErrors((e) => ({ ...e, [field]: "" }));
+  }
+
+  function validate(): boolean {
+    const e: Record<string, string> = {};
+
+    const conviteErr = validateRequired(form.codigoConvite, "Código de convite");
+    if (conviteErr) e.codigoConvite = conviteErr;
+
+    const nomeErr = validateNome(form.nomeCompleto);
+    if (nomeErr) e.nomeCompleto = nomeErr;
+
+    const cpfErr = validateCPF(form.cpf);
+    if (cpfErr) e.cpf = cpfErr;
+
+    const dataErr = validateDataNascimento(form.dataNascimento);
+    if (dataErr) e.dataNascimento = dataErr;
+
+    const emailErr = validateEmail(form.email);
+    if (emailErr) e.email = emailErr;
+
+    const passErr = validatePassword(form.password);
+    if (passErr) e.password = passErr;
+
+    if (form.password !== form.confirmPassword) {
+      e.confirmPassword = "As senhas não coincidem.";
+    } else if (!form.confirmPassword) {
+      e.confirmPassword = "Confirme a senha.";
+    }
+
+    if (!form.estabelecimentoId) e.estabelecimentoId = "Selecione uma unidade de refeição.";
+
+    setErrors(e);
+    return Object.keys(e).length === 0;
   }
 
   async function handleSubmit() {
     setError("");
-    if (form.password !== form.confirmPassword) {
-      setError("As senhas não coincidem.");
-      return;
-    }
-    if (!form.codigoConvite || !form.nomeCompleto || !form.cpf || !form.dataNascimento || !form.email || !form.password) {
-      setError("Preencha todos os campos.");
-      return;
-    }
+    if (!validate()) return;
 
     setLoading(true);
     try {
@@ -44,10 +106,11 @@ export default function CadastroResponsavel() {
         codigoConvite: form.codigoConvite,
         tipoUsuario: "Responsavel",
         nomeCompleto: form.nomeCompleto,
-        cpf: form.cpf,
+        cpf: form.cpf.replace(/\D/g, ""),
         dataNascimento: form.dataNascimento,
         email: form.email,
         password: form.password,
+        estabelecimentoId: Number(form.estabelecimentoId),
       });
       router.push("/");
     } catch (err: unknown) {
@@ -91,15 +154,39 @@ export default function CadastroResponsavel() {
           <p className="mt-1 text-[14px] font-medium text-black/60 sm:text-[16px]">Responsável pela unidade de refeição avaliada.</p>
 
           <div className="mt-5 flex flex-col gap-4 sm:mt-6 sm:gap-5">
-            <input type="text" placeholder="Código de convite" value={form.codigoConvite} onChange={(e) => set("codigoConvite", e.target.value)} className={inputClass} />
-            <input type="text" placeholder="Nome completo" value={form.nomeCompleto} onChange={(e) => set("nomeCompleto", e.target.value)} className={inputClass} />
-            <input type="text" placeholder="CPF (somente números)" value={form.cpf} onChange={(e) => set("cpf", e.target.value)} className={inputClass} />
-            <input type="date" placeholder="Data de nascimento" value={form.dataNascimento} onChange={(e) => set("dataNascimento", e.target.value)} className={inputClass} />
-            <input type="email" placeholder="E-mail" value={form.email} onChange={(e) => set("email", e.target.value)} className={inputClass} />
-            <input type="password" placeholder="Senha" value={form.password} onChange={(e) => set("password", e.target.value)} className={inputClass} />
-            <input type="password" placeholder="Confirmar senha" value={form.confirmPassword} onChange={(e) => set("confirmPassword", e.target.value)} className={inputClass} />
+            <input type="text" placeholder="Código de convite" value={form.codigoConvite} onChange={(e) => set("codigoConvite", e.target.value)} className={errors.codigoConvite ? inputErrorClass : inputClass} />
+            <FieldError msg={errors.codigoConvite} />
 
-{error && <p className="px-2 text-[13px] font-medium text-red-500">{error}</p>}
+            <input type="text" placeholder="Nome completo" value={form.nomeCompleto} onChange={(e) => set("nomeCompleto", e.target.value)} className={errors.nomeCompleto ? inputErrorClass : inputClass} />
+            <FieldError msg={errors.nomeCompleto} />
+
+            <input type="text" placeholder="CPF" value={form.cpf} onChange={(e) => set("cpf", maskCPF(e.target.value))} className={errors.cpf ? inputErrorClass : inputClass} />
+            <FieldError msg={errors.cpf} />
+
+            <input type="date" placeholder="Data de nascimento" value={form.dataNascimento} onChange={(e) => set("dataNascimento", e.target.value)} className={errors.dataNascimento ? inputErrorClass : inputClass} />
+            <FieldError msg={errors.dataNascimento} />
+
+            <input type="email" placeholder="E-mail" value={form.email} onChange={(e) => set("email", e.target.value)} className={errors.email ? inputErrorClass : inputClass} />
+            <FieldError msg={errors.email} />
+
+            <input type="password" placeholder="Senha (mínimo 8 caracteres)" value={form.password} onChange={(e) => set("password", e.target.value)} className={errors.password ? inputErrorClass : inputClass} />
+            <FieldError msg={errors.password} />
+
+            <input type="password" placeholder="Confirmar senha" value={form.confirmPassword} onChange={(e) => set("confirmPassword", e.target.value)} className={errors.confirmPassword ? inputErrorClass : inputClass} />
+            <FieldError msg={errors.confirmPassword} />
+
+            <div className="relative">
+              <select value={form.estabelecimentoId} onChange={(e) => set("estabelecimentoId", e.target.value)} className={errors.estabelecimentoId ? selectErrorClass : selectClass}>
+                <option value="">Unidade de refeição</option>
+                {estabelecimentos.map((e) => (
+                  <option key={e.id} value={e.id}>{e.nome}</option>
+                ))}
+              </select>
+              {chevron}
+            </div>
+            <FieldError msg={errors.estabelecimentoId} />
+
+            {error && <p className="px-2 text-[13px] font-medium text-red-500">{error}</p>}
 
             <button
               onClick={handleSubmit}

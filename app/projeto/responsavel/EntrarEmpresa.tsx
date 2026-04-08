@@ -3,9 +3,13 @@
 import Image from "next/image";
 import { useState } from "react";
 import { buscarEmpresaPorCnpj, vincularEmpresaAoUsuario } from "@/lib/empresas";
+import { maskCNPJ, validateCNPJ } from "@/lib/validators";
 
 const inputClass =
   "h-[50px] w-full rounded-full border border-[#9e9e9e]/24 bg-white px-6 text-[15px] font-medium text-[#2e2e2e] placeholder-[#a3b5bf] outline-none transition-colors focus:border-[#0f62ac]/40 sm:h-[55px] sm:text-[17px]";
+
+const inputErrorClass =
+  "h-[50px] w-full rounded-full border border-red-400 bg-white px-6 text-[15px] font-medium text-[#2e2e2e] placeholder-[#a3b5bf] outline-none transition-colors focus:border-red-500 sm:h-[55px] sm:text-[17px]";
 
 export default function EntrarEmpresa({
   onVoltar,
@@ -16,6 +20,7 @@ export default function EntrarEmpresa({
 }) {
   const [cnpj, setCnpj] = useState("");
   const [error, setError] = useState("");
+  const [fieldError, setFieldError] = useState("");
   const [loading, setLoading] = useState(false);
   const [empresaEncontrada, setEmpresaEncontrada] = useState<{
     id: number;
@@ -26,16 +31,18 @@ export default function EntrarEmpresa({
 
   async function handleBuscar() {
     setError("");
+    setFieldError("");
     setEmpresaEncontrada(null);
 
-    if (!cnpj.trim()) {
-      setError("Digite o CNPJ da empresa.");
+    const cnpjErr = validateCNPJ(cnpj);
+    if (cnpjErr) {
+      setFieldError(cnpjErr);
       return;
     }
 
     setLoading(true);
     try {
-      const empresa = await buscarEmpresaPorCnpj(cnpj.trim());
+      const empresa = await buscarEmpresaPorCnpj(cnpj.replace(/\D/g, ""));
       setEmpresaEncontrada(empresa);
     } catch (err: unknown) {
       setError(
@@ -73,16 +80,7 @@ export default function EntrarEmpresa({
         className="absolute left-6 top-6 z-20 flex size-10 items-center justify-center rounded-full text-[#2e2e2e] transition-colors hover:bg-white/50 sm:left-10 sm:top-10 md:left-[120px] md:top-[140px]"
         aria-label="Voltar"
       >
-        <svg
-          width="24"
-          height="24"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        >
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
           <path d="M19 12H5M12 19l-7-7 7-7" />
         </svg>
       </button>
@@ -98,81 +96,56 @@ export default function EntrarEmpresa({
         {/* Header */}
         <div className="flex items-center gap-3">
           <div className="flex size-[50px] items-center justify-center rounded-md bg-[#0f62ac] sm:size-[60px]">
-            <Image
-              src="/images/uff-logo.png"
-              alt="NutriSec"
-              width={44}
-              height={22}
-              className="h-[20px] w-[40px] object-contain brightness-0 invert sm:h-[27px] sm:w-[54px]"
-            />
+            <Image src="/images/uff-logo.png" alt="NutriSec" width={44} height={22} className="h-[20px] w-[40px] object-contain brightness-0 invert sm:h-[27px] sm:w-[54px]" />
           </div>
           <div>
-            <h1 className="font-[family-name:var(--font-heading)] text-[20px] font-bold tracking-tight text-black sm:text-[24px]">
-              NutriSec
-            </h1>
-            <p className="text-[14px] font-medium text-black/60 sm:text-[16px]">
-              Entrar em uma empresa
-            </p>
+            <h1 className="font-[family-name:var(--font-heading)] text-[20px] font-bold tracking-tight text-black sm:text-[24px]">NutriSec</h1>
+            <p className="text-[14px] font-medium text-black/60 sm:text-[16px]">Entrar em uma empresa</p>
           </div>
         </div>
 
         {/* Content */}
         <div className="mt-8 sm:mt-10">
-          <h2 className="font-[family-name:var(--font-heading)] text-[20px] font-bold tracking-tight text-black sm:text-[24px]">
-            Buscar empresa
-          </h2>
-          <p className="mt-1 text-[14px] font-medium text-black/60 sm:text-[16px]">
-            Digite o CNPJ da empresa para encontrá-la.
-          </p>
+          <h2 className="font-[family-name:var(--font-heading)] text-[20px] font-bold tracking-tight text-black sm:text-[24px]">Buscar empresa</h2>
+          <p className="mt-1 text-[14px] font-medium text-black/60 sm:text-[16px]">Digite o CNPJ da empresa para encontrá-la.</p>
 
           <div className="mt-5 flex flex-col gap-4 sm:mt-6 sm:gap-5">
             <input
               type="text"
               placeholder="CNPJ da empresa"
               value={cnpj}
-              onChange={(e) => setCnpj(e.target.value)}
-              className={inputClass}
+              onChange={(e) => {
+                setCnpj(maskCNPJ(e.target.value));
+                setFieldError("");
+              }}
+              className={fieldError ? inputErrorClass : inputClass}
             />
+            {fieldError && (
+              <p className="-mt-2 px-6 text-[12px] font-medium text-red-500">{fieldError}</p>
+            )}
 
             {/* Empresa encontrada */}
             {empresaEncontrada && (
               <div className="rounded-2xl border-2 border-[#0f62ac] bg-[#0f62ac]/5 p-5">
                 <div className="flex items-center gap-3">
                   <div className="flex size-10 items-center justify-center rounded-lg bg-[#0f62ac]/10">
-                    <svg
-                      width="20"
-                      height="20"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="#0f62ac"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    >
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#0f62ac" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                       <path d="M3 21h18" />
                       <path d="M5 21V7l8-4v18" />
                       <path d="M19 21V11l-6-4" />
                     </svg>
                   </div>
                   <div>
-                    <p className="font-[family-name:var(--font-heading)] text-[16px] font-bold text-[#2e2e2e]">
-                      {empresaEncontrada.nomeFantasia}
-                    </p>
-                    <p className="text-[13px] font-medium text-[#6b7280]">
-                      {empresaEncontrada.razaoSocial}
-                    </p>
-                    <p className="text-[12px] font-medium text-[#6b7280]">
-                      CNPJ: {empresaEncontrada.cnpj}
-                    </p>
+                    <p className="font-[family-name:var(--font-heading)] text-[16px] font-bold text-[#2e2e2e]">{empresaEncontrada.nomeFantasia}</p>
+                    <p className="text-[13px] font-medium text-[#6b7280]">{empresaEncontrada.razaoSocial}</p>
+                    <p className="text-[12px] font-medium text-[#6b7280]">CNPJ: {empresaEncontrada.cnpj}</p>
                   </div>
                 </div>
               </div>
             )}
 
             {error && (
-              <p className="px-2 text-[13px] font-medium text-red-500">
-                {error}
-              </p>
+              <p className="px-2 text-[13px] font-medium text-red-500">{error}</p>
             )}
 
             {!empresaEncontrada ? (
