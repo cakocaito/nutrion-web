@@ -1,21 +1,13 @@
 "use client";
 
 import Image from "next/image";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { register, getEstabelecimentos } from "@/lib/register";
+import { register } from "@/lib/register";
 
 const inputClass =
   "h-[50px] w-full rounded-full border border-[#9e9e9e]/24 bg-white px-6 text-[15px] font-medium text-[#2e2e2e] placeholder-[#a3b5bf] outline-none transition-colors focus:border-[#0f62ac]/40 sm:h-[55px] sm:text-[17px]";
 
-const selectClass =
-  "h-[50px] w-full appearance-none rounded-full border border-[#9e9e9e]/24 bg-white px-6 pr-12 text-[15px] font-medium text-[#a3b5bf] outline-none transition-colors focus:border-[#0f62ac]/40 sm:h-[55px] sm:text-[17px]";
-
-const chevron = (
-  <svg className="pointer-events-none absolute right-5 top-1/2 -translate-y-1/2 text-[#a3b5bf]" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M6 9l6 6 6-6" />
-  </svg>
-);
 
 export default function CadastroResponsavel() {
   const router = useRouter();
@@ -27,15 +19,9 @@ export default function CadastroResponsavel() {
     email: "",
     password: "",
     confirmPassword: "",
-    estabelecimentoId: "",
   });
-  const [estabelecimentos, setEstabelecimentos] = useState<{ id: number; nome: string }[]>([]);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-
-  useEffect(() => {
-    getEstabelecimentos().then(setEstabelecimentos).catch(() => {});
-  }, []);
 
   function set(field: string, value: string) {
     setForm((f) => ({ ...f, [field]: value }));
@@ -47,7 +33,7 @@ export default function CadastroResponsavel() {
       setError("As senhas não coincidem.");
       return;
     }
-    if (!form.codigoConvite || !form.nomeCompleto || !form.cpf || !form.dataNascimento || !form.email || !form.password || !form.estabelecimentoId) {
+    if (!form.codigoConvite || !form.nomeCompleto || !form.cpf || !form.dataNascimento || !form.email || !form.password) {
       setError("Preencha todos os campos.");
       return;
     }
@@ -62,7 +48,6 @@ export default function CadastroResponsavel() {
         dataNascimento: form.dataNascimento,
         email: form.email,
         password: form.password,
-        estabelecimentoId: Number(form.estabelecimentoId),
       });
       router.push("/");
     } catch (err: unknown) {
@@ -114,17 +99,7 @@ export default function CadastroResponsavel() {
             <input type="password" placeholder="Senha" value={form.password} onChange={(e) => set("password", e.target.value)} className={inputClass} />
             <input type="password" placeholder="Confirmar senha" value={form.confirmPassword} onChange={(e) => set("confirmPassword", e.target.value)} className={inputClass} />
 
-            <div className="relative">
-              <select value={form.estabelecimentoId} onChange={(e) => set("estabelecimentoId", e.target.value)} className={selectClass}>
-                <option value="">Unidade de refeição</option>
-                {estabelecimentos.map((e) => (
-                  <option key={e.id} value={e.id}>{e.nome}</option>
-                ))}
-              </select>
-              {chevron}
-            </div>
-
-            {error && <p className="px-2 text-[13px] font-medium text-red-500">{error}</p>}
+{error && <p className="px-2 text-[13px] font-medium text-red-500">{error}</p>}
 
             <button
               onClick={handleSubmit}
