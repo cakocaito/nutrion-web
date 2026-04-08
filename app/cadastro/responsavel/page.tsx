@@ -1,9 +1,9 @@
 "use client";
 
 import Image from "next/image";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { register, getEstabelecimentos } from "@/lib/register";
+import { register } from "@/lib/register";
 import {
   maskCPF,
   validateCPF,
@@ -20,18 +20,6 @@ const inputClass =
 const inputErrorClass =
   "h-[50px] w-full rounded-full border border-red-400 bg-white px-6 text-[15px] font-medium text-[#2e2e2e] placeholder-[#a3b5bf] outline-none transition-colors focus:border-red-500 sm:h-[55px] sm:text-[17px]";
 
-const selectClass =
-  "h-[50px] w-full appearance-none rounded-full border border-[#9e9e9e]/24 bg-white px-6 pr-12 text-[15px] font-medium text-[#a3b5bf] outline-none transition-colors focus:border-[#0f62ac]/40 sm:h-[55px] sm:text-[17px]";
-
-const selectErrorClass =
-  "h-[50px] w-full appearance-none rounded-full border border-red-400 bg-white px-6 pr-12 text-[15px] font-medium text-[#a3b5bf] outline-none transition-colors focus:border-red-500 sm:h-[55px] sm:text-[17px]";
-
-const chevron = (
-  <svg className="pointer-events-none absolute right-5 top-1/2 -translate-y-1/2 text-[#a3b5bf]" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M6 9l6 6 6-6" />
-  </svg>
-);
-
 function FieldError({ msg }: { msg?: string }) {
   if (!msg) return null;
   return <p className="-mt-2 px-6 text-[12px] font-medium text-red-500">{msg}</p>;
@@ -47,16 +35,10 @@ export default function CadastroResponsavel() {
     email: "",
     password: "",
     confirmPassword: "",
-    estabelecimentoId: "",
   });
-  const [estabelecimentos, setEstabelecimentos] = useState<{ id: number; nome: string }[]>([]);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-
-  useEffect(() => {
-    getEstabelecimentos().then(setEstabelecimentos).catch(() => {});
-  }, []);
 
   function set(field: string, value: string) {
     setForm((f) => ({ ...f, [field]: value }));
@@ -90,8 +72,6 @@ export default function CadastroResponsavel() {
       e.confirmPassword = "Confirme a senha.";
     }
 
-    if (!form.estabelecimentoId) e.estabelecimentoId = "Selecione uma unidade de refeição.";
-
     setErrors(e);
     return Object.keys(e).length === 0;
   }
@@ -110,7 +90,6 @@ export default function CadastroResponsavel() {
         dataNascimento: form.dataNascimento,
         email: form.email,
         password: form.password,
-        estabelecimentoId: Number(form.estabelecimentoId),
       });
       router.push("/");
     } catch (err: unknown) {
@@ -174,17 +153,6 @@ export default function CadastroResponsavel() {
 
             <input type="password" placeholder="Confirmar senha" value={form.confirmPassword} onChange={(e) => set("confirmPassword", e.target.value)} className={errors.confirmPassword ? inputErrorClass : inputClass} />
             <FieldError msg={errors.confirmPassword} />
-
-            <div className="relative">
-              <select value={form.estabelecimentoId} onChange={(e) => set("estabelecimentoId", e.target.value)} className={errors.estabelecimentoId ? selectErrorClass : selectClass}>
-                <option value="">Unidade de refeição</option>
-                {estabelecimentos.map((e) => (
-                  <option key={e.id} value={e.id}>{e.nome}</option>
-                ))}
-              </select>
-              {chevron}
-            </div>
-            <FieldError msg={errors.estabelecimentoId} />
 
             {error && <p className="px-2 text-[13px] font-medium text-red-500">{error}</p>}
 
