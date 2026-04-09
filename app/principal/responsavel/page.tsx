@@ -91,10 +91,7 @@ export default function PrincipalResponsavel() {
             </h1>
 
             <p className="mx-auto mt-6 max-w-[600px] text-[15px] font-medium leading-[1.5] tracking-tight text-[#2e2e2e]/80 sm:text-[16px] lg:mx-0 lg:text-[17px]">
-              Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
-              eiusmod tempor incididunt ut labore et dolore magna aliqua.
-              Pellentesque habitant morbi tristique senectus et netus. Vulputate
-              odio ut enim blandit. Quisque egestas diam in arcu cursus.
+              As Doenças de Transmissão Hídrica e Alimentar (DTHA) são relevantes para a saúde pública e o desenvolvimento socioeconômico. Nos serviços de alimentação, fatores de risco físico-funcionais, ambientais, técnicos e operacionais contribuem para surtos de DTHA. O NutriSec disponibiliza um <strong>checklist digital</strong> para avaliar as condições operacionais e os fatores de risco sanitário com implicações diretas para as DTHA.
             </p>
 
             {/* CTA — Só Responsável */}

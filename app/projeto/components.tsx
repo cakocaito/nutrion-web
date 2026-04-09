@@ -1,6 +1,6 @@
 "use client";
 
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useState } from "react";
 import { useAuth } from "@/context/AuthContext";
 
@@ -220,12 +220,16 @@ export function Sidebar({
   onToggle: () => void;
 }) {
   const router = useRouter();
+  const pathname = usePathname();
   const { logout } = useAuth();
 
   function handleLogout() {
     logout();
     router.push("/");
   }
+
+  const isHome = pathname === `/principal/${role}`;
+  const isAvaliacoes = pathname.startsWith(`/projeto/${role}`);
 
   return (
     <aside
@@ -246,17 +250,25 @@ export function Sidebar({
       {/* Nav Items */}
       <nav className="mt-4 flex flex-1 flex-col gap-1 px-3">
         <SidebarItem
-          icon={<HomeIcon active />}
+          icon={<HomeIcon active={isHome} />}
           label="Início"
-          active
+          active={isHome}
           collapsed={collapsed}
           onClick={() => router.push(`/principal/${role}`)}
         />
         <SidebarItem
           icon={<BranchIcon />}
           label="Avaliações"
+          active={isAvaliacoes}
           collapsed={collapsed}
           onClick={() => router.push(`/projeto/${role}`)}
+        />
+        <SidebarItem
+          icon={<SettingsIcon />}
+          label="Perfil"
+          active={pathname === "/perfil"}
+          collapsed={collapsed}
+          onClick={() => router.push("/perfil")}
         />
       </nav>
 
@@ -319,12 +331,16 @@ export function MobileSidebar({
   onClose: () => void;
 }) {
   const router = useRouter();
+  const pathname = usePathname();
   const { logout } = useAuth();
 
   function handleLogout() {
     logout();
     router.push("/");
   }
+
+  const isHome = pathname === `/principal/${role}`;
+  const isAvaliacoes = pathname.startsWith(`/projeto/${role}`);
 
   if (!open) return null;
 
@@ -348,23 +364,25 @@ export function MobileSidebar({
 
         <nav className="mt-4 flex flex-1 flex-col gap-1 px-3">
           <SidebarItem
-            icon={<HomeIcon active />}
+            icon={<HomeIcon active={isHome} />}
             label="Início"
-            active
+            active={isHome}
             collapsed={false}
-            onClick={() => {
-              router.push(`/principal/${role}`);
-              onClose();
-            }}
+            onClick={() => { router.push(`/principal/${role}`); onClose(); }}
           />
           <SidebarItem
             icon={<BranchIcon />}
             label="Avaliações"
+            active={isAvaliacoes}
             collapsed={false}
-            onClick={() => {
-              router.push(`/projeto/${role}`);
-              onClose();
-            }}
+            onClick={() => { router.push(`/projeto/${role}`); onClose(); }}
+          />
+          <SidebarItem
+            icon={<SettingsIcon />}
+            label="Perfil"
+            active={pathname === "/perfil"}
+            collapsed={false}
+            onClick={() => { router.push("/perfil"); onClose(); }}
           />
         </nav>
 
