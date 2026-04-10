@@ -739,6 +739,137 @@ export function TopBar({
   );
 }
 
+/* ───── Observações Modal ───── */
+
+interface ObservacaoItem {
+  id: number;
+  autorNome: string;
+  autorRole: string;
+  texto: string;
+  criadaEm: string;
+  isOwn: boolean;
+}
+
+function ObservacoesModal({
+  avaliacaoId,
+  titulo,
+  onClose,
+}: {
+  avaliacaoId: number;
+  titulo: string;
+  onClose: () => void;
+}) {
+  const [observacoes, setObservacoes] = useState<ObservacaoItem[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [texto, setTexto] = useState("");
+  const [enviando, setEnviando] = useState(false);
+  const [erro, setErro] = useState<string | null>(null);
+  const bottomRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    apiFetch(`/api/avaliacoes/${avaliacaoId}/observacoes`)
+      .then((data) => setObservacoes(data))
+      .catch(() => setErro("Erro ao carregar observações."))
+      .finally(() => setLoading(false));
+  }, [avaliacaoId]);
+
+  useEffect(() => {
+    bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [observacoes]);
+
+  async function enviar() {
+    if (!texto.trim()) return;
+    setEnviando(true);
+    setErro(null);
+    try {
+      const nova = await apiFetch(`/api/avaliacoes/${avaliacaoId}/observacoes`, {
+        method: "POST",
+        body: JSON.stringify({ texto }),
+      });
+      setObservacoes((prev) => [...prev, nova]);
+      setTexto("");
+    } catch {
+      setErro("Erro ao enviar.");
+    } finally {
+      setEnviando(false);
+    }
+  }
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
+      <div className="flex w-full max-w-[500px] flex-col rounded-2xl bg-white shadow-xl" style={{ maxHeight: "80vh" }}>
+        {/* Header */}
+        <div className="flex items-center justify-between border-b border-[#e5eaf0] px-5 py-4">
+          <div>
+            <p className="text-[15px] font-bold text-[#2e2e2e]">Observações</p>
+            <p className="text-[12px] text-[#9ca3af]">{titulo}</p>
+          </div>
+          <button
+            onClick={onClose}
+            className="flex size-[30px] items-center justify-center rounded-full text-[#9ca3af] transition-colors hover:bg-gray-100"
+          >
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" />
+            </svg>
+          </button>
+        </div>
+
+        {/* Lista */}
+        <div className="flex-1 overflow-y-auto px-5 py-4">
+          {loading && <p className="text-center text-[13px] text-[#9ca3af]">Carregando...</p>}
+          {!loading && observacoes.length === 0 && (
+            <p className="text-center text-[13px] text-[#9ca3af]">Nenhuma observação ainda. Seja o primeiro a comentar.</p>
+          )}
+          <div className="flex flex-col gap-3">
+            {observacoes.map((o) => (
+              <div key={o.id} className={`flex flex-col gap-1 ${o.isOwn ? "items-end" : "items-start"}`}>
+                <div className="flex items-center gap-1.5">
+                  <span className="text-[11px] font-semibold text-[#6b7280]">{o.autorNome}</span>
+                  <span className={`rounded-full px-1.5 py-0.5 text-[9px] font-bold uppercase ${o.autorRole.toLowerCase() === "consultor" ? "bg-[#0f62ac]/10 text-[#0f62ac]" : "bg-amber-50 text-amber-600"}`}>
+                    {o.autorRole}
+                  </span>
+                </div>
+                <div className={`max-w-[80%] rounded-2xl px-3.5 py-2.5 text-[13px] leading-relaxed ${o.isOwn ? "rounded-tr-sm bg-[#0f62ac] text-white" : "rounded-tl-sm bg-[#f8fafb] text-[#2e2e2e]"}`}>
+                  {o.texto}
+                </div>
+                <span className="text-[10px] text-[#c4cdd6]">
+                  {new Date(o.criadaEm).toLocaleString("pt-BR", { day: "2-digit", month: "short", hour: "2-digit", minute: "2-digit" })}
+                </span>
+              </div>
+            ))}
+            <div ref={bottomRef} />
+          </div>
+        </div>
+
+        {/* Input */}
+        <div className="border-t border-[#e5eaf0] px-4 py-3">
+          {erro && <p className="mb-2 text-[12px] text-[#f25050]">{erro}</p>}
+          <div className="flex gap-2">
+            <input
+              type="text"
+              placeholder="Escreva uma observação..."
+              value={texto}
+              onChange={(e) => setTexto(e.target.value)}
+              onKeyDown={(e) => e.key === "Enter" && !e.shiftKey && enviar()}
+              className="h-[38px] flex-1 rounded-full border border-[#e5eaf0] bg-[#f8fafb] px-4 text-[13px] text-[#2e2e2e] outline-none focus:border-[#0f62ac]/40"
+            />
+            <button
+              onClick={enviar}
+              disabled={enviando || !texto.trim()}
+              className="flex size-[38px] shrink-0 items-center justify-center rounded-full bg-[#0f62ac] text-white transition-colors hover:bg-[#0f62ac]/90 disabled:opacity-40"
+            >
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <line x1="22" y1="2" x2="11" y2="13" />
+                <polygon points="22 2 15 22 11 13 2 9 22 2" />
+              </svg>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 /* ───── Project Card ───── */
 
 export function ProjectCard({
@@ -762,6 +893,7 @@ export function ProjectCard({
   const router = useRouter();
   const [confirmando, setConfirmando] = useState(false);
   const [cancelando, setCancelando] = useState(false);
+  const [obsAberto, setObsAberto] = useState(false);
 
   const statusMap = {
     em_andamento: { label: "Em andamento", color: "bg-[#0f62ac]/10 text-[#0f62ac]" },
@@ -785,6 +917,13 @@ export function ProjectCard({
 
   return (
     <div className="rounded-2xl border border-[#0f62ac]/15 bg-white p-5 transition-shadow hover:shadow-md">
+      {obsAberto && id && (
+        <ObservacoesModal
+          avaliacaoId={id}
+          titulo={title}
+          onClose={() => setObsAberto(false)}
+        />
+      )}
       <div className="flex items-start justify-between">
         <div className="flex-1">
           <h3 className="font-[family-name:var(--font-heading)] text-[16px] font-bold text-[#2e2e2e]">
@@ -835,23 +974,37 @@ export function ProjectCard({
 
       <div className="mt-4 flex items-center justify-between text-[12px] text-[#6b7280]">
         <span>{date}</span>
-        {status === "pendente" && id && (
-          <span className="rounded-md bg-[#f1f8fc] px-2 py-0.5 font-mono font-semibold text-[#0f62ac]">
-            id_pesquisa: {id}
-          </span>
-        )}
-        {temRelatorio && id && (
-          <button
-            onClick={() => router.push(`/relatorio/${id}`)}
-            className="inline-flex items-center gap-1.5 rounded-full bg-emerald-50 px-3 py-1 text-[11px] font-semibold text-emerald-600 transition-colors hover:bg-emerald-100"
-          >
-            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" />
-              <polyline points="14 2 14 8 20 8" />
-            </svg>
-            Ver relatório
-          </button>
-        )}
+        <div className="flex items-center gap-2">
+          {status === "pendente" && id && (
+            <span className="rounded-md bg-[#f1f8fc] px-2 py-0.5 font-mono font-semibold text-[#0f62ac]">
+              id_pesquisa: {id}
+            </span>
+          )}
+          {id && (
+            <button
+              onClick={() => setObsAberto(true)}
+              title="Observações"
+              className="inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-[11px] font-semibold text-[#6b7280] transition-colors hover:bg-[#f8fafb] hover:text-[#0f62ac]"
+            >
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z" />
+              </svg>
+              Obs.
+            </button>
+          )}
+          {temRelatorio && id && (
+            <button
+              onClick={() => router.push(`/relatorio/${id}`)}
+              className="inline-flex items-center gap-1.5 rounded-full bg-emerald-50 px-3 py-1 text-[11px] font-semibold text-emerald-600 transition-colors hover:bg-emerald-100"
+            >
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" />
+                <polyline points="14 2 14 8 20 8" />
+              </svg>
+              Ver relatório
+            </button>
+          )}
+        </div>
       </div>
     </div>
   );
