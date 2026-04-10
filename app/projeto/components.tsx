@@ -3,6 +3,7 @@
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { useAuth } from "@/context/AuthContext";
+import { apiFetch } from "@/lib/api";
 
 /* ───── Icons ───── */
 
@@ -556,6 +557,7 @@ export function ProjectCard({
   status,
   date,
   temRelatorio,
+  onCancelado,
 }: {
   id?: number;
   title: string;
@@ -564,8 +566,11 @@ export function ProjectCard({
   date: string;
   members: number;
   temRelatorio?: boolean;
+  onCancelado?: () => void;
 }) {
   const router = useRouter();
+  const [confirmando, setConfirmando] = useState(false);
+  const [cancelando, setCancelando] = useState(false);
 
   const statusMap = {
     em_andamento: { label: "Em andamento", color: "bg-[#0f62ac]/10 text-[#0f62ac]" },
@@ -574,6 +579,18 @@ export function ProjectCard({
   };
 
   const s = statusMap[status];
+
+  async function handleCancelar() {
+    if (!id) return;
+    setCancelando(true);
+    try {
+      await apiFetch(`/api/avaliacoes/${id}`, { method: "DELETE" });
+      onCancelado?.();
+    } finally {
+      setCancelando(false);
+      setConfirmando(false);
+    }
+  }
 
   return (
     <div className="rounded-2xl border border-[#0f62ac]/15 bg-white p-5 transition-shadow hover:shadow-md">
@@ -586,10 +603,45 @@ export function ProjectCard({
             {institution}
           </p>
         </div>
-        <span className={`shrink-0 rounded-full px-3 py-1 text-[11px] font-semibold ${s.color}`}>
-          {s.label}
-        </span>
+        <div className="flex items-center gap-2">
+          <span className={`shrink-0 rounded-full px-3 py-1 text-[11px] font-semibold ${s.color}`}>
+            {s.label}
+          </span>
+          {status === "pendente" && id && !confirmando && (
+            <button
+              onClick={() => setConfirmando(true)}
+              title="Cancelar avaliação"
+              className="flex size-[28px] items-center justify-center rounded-full text-[#9ca3af] transition-colors hover:bg-red-50 hover:text-red-500"
+            >
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <line x1="18" y1="6" x2="6" y2="18" />
+                <line x1="6" y1="6" x2="18" y2="18" />
+              </svg>
+            </button>
+          )}
+        </div>
       </div>
+
+      {/* Confirmação de cancelamento */}
+      {confirmando && (
+        <div className="mt-3 flex items-center gap-2 rounded-xl bg-red-50 px-3 py-2.5">
+          <p className="flex-1 text-[12px] text-red-600">Cancelar esta avaliação?</p>
+          <button
+            onClick={handleCancelar}
+            disabled={cancelando}
+            className="rounded-lg bg-red-500 px-3 py-1 text-[11px] font-semibold text-white transition-colors hover:bg-red-600 disabled:opacity-50"
+          >
+            {cancelando ? "..." : "Sim"}
+          </button>
+          <button
+            onClick={() => setConfirmando(false)}
+            className="rounded-lg px-3 py-1 text-[11px] font-semibold text-[#6b7280] transition-colors hover:bg-red-100"
+          >
+            Não
+          </button>
+        </div>
+      )}
+
       <div className="mt-4 flex items-center justify-between text-[12px] text-[#6b7280]">
         <span>{date}</span>
         {status === "pendente" && id && (

@@ -327,6 +327,7 @@ export default function ProjetoConsultor() {
                 date={new Date(a.dataAgendada).toLocaleDateString("pt-BR", { month: "short", year: "numeric" })}
                 members={0}
                 temRelatorio={a.temRelatorio}
+                onCancelado={carregarAvaliacoes}
               />
             ))}
           </div>
