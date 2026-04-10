@@ -4,132 +4,121 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useAuth } from "@/context/AuthContext";
-
-const navLinks = [
-  { label: "Sobre", href: "#sobre" },
-  { label: "Serviços", href: "#servicos" },
-  { label: "Minha conta", href: "#conta" },
-];
+import { Sidebar, MobileSidebar, TopBar } from "@/app/projeto/components";
 
 export default function PrincipalResponsavel() {
   const router = useRouter();
-  const { logout } = useAuth();
+  const { user } = useAuth();
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-  function handleLogout() {
-    logout();
-    router.push("/");
-  }
-
   return (
-    <div className="relative min-h-screen overflow-hidden bg-[#f1f8fc]">
-      <div className="pointer-events-none absolute -left-[100px] top-[40px] size-[268px] rounded-full bg-gradient-to-br from-[#0f62ac]/5 to-transparent blur-3xl" />
-      <div className="pointer-events-none absolute -right-[50px] -top-[60px] size-[245px] rounded-full bg-gradient-to-bl from-[#0f62ac]/8 to-transparent blur-3xl" />
-
-      {/* Header */}
-      <header className="relative z-20 flex items-center justify-between px-6 py-5 md:px-12 lg:px-[50px]">
-        <div className="flex size-[42px] items-center justify-center rounded-md bg-[#0f62ac]">
-          <Image
-            src="/images/uff-logo.png"
-            alt="Nutrion"
-            width={36}
-            height={18}
-            className="h-[18px] w-[36px] object-contain brightness-0 invert"
-          />
-        </div>
-
-        <nav className="hidden items-center gap-8 lg:flex xl:gap-[60px]">
-          {navLinks.map((link) => (
-            <a
-              key={link.label}
-              href={link.href}
-              className="text-[15px] font-semibold tracking-tight text-[#2e2e2e] transition-colors hover:text-[#0f62ac] lg:text-[17px]"
-            >
-              {link.label}
-            </a>
-          ))}
-          <button
-            onClick={handleLogout}
-            className="text-[15px] font-semibold tracking-tight text-[#f25050] transition-colors hover:text-[#f25050]/80 lg:text-[17px]"
-          >
-            Sair
-          </button>
-        </nav>
-
-        <button
-          onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-          className="flex flex-col gap-1.5 lg:hidden"
-          aria-label="Menu"
-        >
-          <span className={`block h-0.5 w-6 bg-[#2e2e2e] transition-all duration-300 ${mobileMenuOpen ? "translate-y-2 rotate-45" : ""}`} />
-          <span className={`block h-0.5 w-6 bg-[#2e2e2e] transition-all duration-300 ${mobileMenuOpen ? "opacity-0" : ""}`} />
-          <span className={`block h-0.5 w-6 bg-[#2e2e2e] transition-all duration-300 ${mobileMenuOpen ? "-translate-y-2 -rotate-45" : ""}`} />
-        </button>
-      </header>
-
-      {/* Mobile Menu */}
-      <div className={`absolute inset-x-0 top-[72px] z-30 border-b border-[#0f62ac]/10 bg-white/95 px-6 py-4 shadow-lg backdrop-blur-md transition-all duration-300 lg:hidden ${mobileMenuOpen ? "translate-y-0 opacity-100" : "pointer-events-none -translate-y-4 opacity-0"}`}>
-        <nav className="flex flex-col gap-4">
-          {navLinks.map((link) => (
-            <a key={link.label} href={link.href} className="text-base font-semibold text-[#2e2e2e] transition-colors hover:text-[#0f62ac]" onClick={() => setMobileMenuOpen(false)}>
-              {link.label}
-            </a>
-          ))}
-          <button onClick={handleLogout} className="text-left text-base font-semibold text-[#f25050]">
-            Sair
-          </button>
-        </nav>
+    <div className="flex min-h-screen bg-[#f8fafb]">
+      <div className="hidden lg:block">
+        <Sidebar
+          role="responsavel"
+          collapsed={sidebarCollapsed}
+          onToggle={() => setSidebarCollapsed(!sidebarCollapsed)}
+        />
       </div>
 
-      {/* Hero */}
-      <main className="relative z-10 px-6 pt-8 md:px-12 md:pt-12 lg:px-[50px] lg:pt-16">
-        <div className="flex flex-col items-center gap-8 lg:flex-row lg:items-start lg:gap-0">
-          <div className="flex max-w-[785px] flex-1 flex-col text-center lg:text-left">
-            <h1 className="font-[family-name:var(--font-heading)] text-[32px] font-extrabold leading-[1.1] tracking-tight sm:text-[44px] md:text-[52px] lg:text-[60px] lg:tracking-[-2.4px]">
-              <span className="text-[#0f62ac]">Facilitando</span> a avaliação
-              de serviços alimentares.
-            </h1>
+      <MobileSidebar
+        role="responsavel"
+        open={mobileMenuOpen}
+        onClose={() => setMobileMenuOpen(false)}
+      />
 
-            <p className="mx-auto mt-6 max-w-[600px] text-[15px] font-medium leading-[1.5] tracking-tight text-[#2e2e2e]/80 sm:text-[16px] lg:mx-0 lg:text-[17px]">
-              As Doenças de Transmissão Hídrica e Alimentar (DTHA) são relevantes para a saúde pública e o desenvolvimento socioeconômico. Nos serviços de alimentação, fatores de risco físico-funcionais, ambientais, técnicos e operacionais contribuem para surtos de DTHA. O NutriSec disponibiliza um <strong>checklist digital</strong> para avaliar as condições operacionais e os fatores de risco sanitário com implicações diretas para as DTHA.
-            </p>
+      <div
+        className={`flex flex-1 flex-col transition-all duration-300 ${sidebarCollapsed ? "lg:ml-[68px]" : "lg:ml-[240px]"}`}
+      >
+        <TopBar
+          role="responsavel"
+          onMenuToggle={() => setMobileMenuOpen(true)}
+        />
 
-            {/* CTA — Só Responsável */}
-            <div className="mt-8 flex flex-col items-center gap-3 sm:flex-row sm:justify-center lg:justify-start">
-              <button
-                onClick={() => router.push("/projeto/responsavel")}
-                className="inline-flex h-[45px] w-full items-center justify-center rounded-full bg-[#0f62ac] px-6 text-[15px] font-medium text-white transition-colors hover:bg-[#0f62ac]/90 sm:w-auto sm:min-w-[250px] sm:text-[16px]"
-              >
-                Iniciar como Responsável
-              </button>
+        <main className="flex-1 px-4 py-6 sm:px-6 lg:px-8">
+          {/* Boas-vindas */}
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <h1 className="font-[family-name:var(--font-heading)] text-[22px] font-bold text-[#2e2e2e] sm:text-[26px]">
+                Olá, {user?.nomeCompleto?.split(" ")[0] ?? "Responsável"} 👋
+              </h1>
+              <p className="mt-1 text-[14px] font-medium text-[#6b7280]">
+                Bem-vindo ao NutriSec — Sistema de avaliação de segurança alimentar
+              </p>
+            </div>
+            <button
+              onClick={() => router.push("/projeto/responsavel")}
+              className="inline-flex h-[38px] items-center gap-2 rounded-full bg-[#0f62ac] px-5 text-[13px] font-semibold text-white transition-colors hover:bg-[#0f62ac]/90"
+            >
+              Ver avaliações
+            </button>
+          </div>
+
+          <div className="mt-6 grid gap-4 lg:grid-cols-2">
+            {/* Sobre o projeto */}
+            <div className="rounded-2xl border border-[#0f62ac]/15 bg-white p-6 lg:col-span-2">
+              <h2 className="font-[family-name:var(--font-heading)] text-[16px] font-bold text-[#2e2e2e]">
+                Sobre o projeto
+              </h2>
+              <p className="mt-3 text-[14px] leading-relaxed text-[#6b7280]">
+                As Doenças de Transmissão Hídrica e Alimentar (DTHA) estão entre as principais causas de morbidade e mortalidade em nível global — cerca de 420.000 pessoas morrem anualmente vítimas de DTHA (OMS). As Boas Práticas (BPs) são obrigatórias para a garantia da segurança dos alimentos, sendo a aplicação de lista de verificação um instrumento essencial para avaliar não conformidades e riscos sanitários.
+              </p>
+              <p className="mt-3 text-[14px] leading-relaxed text-[#6b7280]">
+                O <strong className="text-[#2e2e2e]">NutriSec</strong> é um checklist digital desenvolvido para avaliar as condições operacionais e os fatores de risco sanitário com implicações diretas para as DTHA nos serviços de alimentação da Universidade Federal Fluminense.
+              </p>
               <a
-                href="#conhecer"
-                className="inline-flex h-[45px] w-full items-center justify-center rounded-full border-2 border-[#0f62ac] px-6 text-[15px] font-medium text-[#0f62ac] transition-colors hover:bg-[#0f62ac]/5 sm:w-auto sm:min-w-[150px] sm:text-[16px]"
+                href="https://revistapibic.uff.br/wp-content/uploads/sites/343/2026/01/RevistaPIBIC2024.pdf"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="mt-4 inline-flex items-center gap-2 text-[13px] font-semibold text-[#0f62ac] transition-colors hover:text-[#0f62ac]/80"
               >
-                Conhecer
+                Ver artigo publicado — Revista PIBIC UFF 2024
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6" />
+                  <polyline points="15 3 21 3 21 9" />
+                  <line x1="10" y1="14" x2="21" y2="3" />
+                </svg>
               </a>
             </div>
 
-            {/* Partner Logos */}
-            <div className="mt-10 flex items-center justify-center gap-4 lg:justify-start">
-              <div className="flex items-center gap-3">
-                <Image src="/images/uff-shield.png" alt="UFF" width={55} height={30} className="h-[30px] w-auto object-contain" />
-                <Image src="/images/partner-logo.svg" alt="Universidade Federal Fluminense" width={55} height={30} className="h-[30px] w-auto object-contain" />
-              </div>
-              <div className="h-[40px] w-[2px] bg-[#0f62ac]/12" />
-              <Image src="/images/ufrj-logo.png" alt="UFRJ" width={62} height={49} className="h-[42px] w-auto object-contain" />
+            {/* Equipe */}
+            <div className="rounded-2xl border border-[#0f62ac]/15 bg-white p-6">
+              <h2 className="font-[family-name:var(--font-heading)] text-[16px] font-bold text-[#2e2e2e]">
+                Equipe do projeto
+              </h2>
+              <ul className="mt-3 flex flex-col gap-2 text-[13px] text-[#6b7280]">
+                <li><span className="font-semibold text-[#2e2e2e]">Maria das Graças G. A. Medeiros</span> — Faculdade de Nutrição</li>
+                <li><span className="font-semibold text-[#2e2e2e]">Luisa Da Costa De Paula Antunes</span> — Faculdade de Nutrição</li>
+                <li><span className="font-semibold text-[#2e2e2e]">Gustavo Constantino Fernandes</span> — Faculdade de Estatística</li>
+                <li><span className="font-semibold text-[#2e2e2e]">João Gabriel Mattos Otogali</span> — Instituto da Computação</li>
+                <li><span className="font-semibold text-[#2e2e2e]">Anna Beatriz de Sousa Oliveira</span> — Faculdade de Nutrição</li>
+                <li><span className="font-semibold text-[#2e2e2e]">Maristela Soares Lourenço</span> — Faculdade de Nutrição</li>
+                <li><span className="font-semibold text-[#2e2e2e]">Manoela Pessanha da Penha</span> — Faculdade de Nutrição</li>
+                <li><span className="font-semibold text-[#2e2e2e]">Fernanda Silveira dos Anjos Bainha</span> — Faculdade de Nutrição</li>
+              </ul>
             </div>
-          </div>
 
-          {/* Illustration */}
-          <div className="relative mt-4 flex w-full max-w-[420px] items-center justify-center lg:mt-0 lg:w-[512px] lg:max-w-none lg:flex-none">
-            <div className="relative aspect-square w-full overflow-hidden rounded-[200px] bg-gradient-to-br from-[#0f62ac]/5 via-[#0f62ac]/10 to-[#0f62ac]/5 lg:rounded-[260px]">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src="/images/hero-illustration.svg" alt="Ilustração" className="absolute inset-0 size-full object-contain p-8" />
+            {/* Parceiros */}
+            <div className="rounded-2xl border border-[#0f62ac]/15 bg-white p-6">
+              <h2 className="font-[family-name:var(--font-heading)] text-[16px] font-bold text-[#2e2e2e]">
+                Instituições parceiras
+              </h2>
+              <div className="mt-4 flex items-center gap-6">
+                <div className="flex items-center gap-3">
+                  <Image src="/images/uff-shield.png" alt="UFF" width={55} height={55} className="h-[48px] w-auto object-contain" />
+                  <Image src="/images/partner-logo.svg" alt="UFF" width={120} height={30} className="h-[24px] w-auto object-contain" />
+                </div>
+                <div className="h-[40px] w-[1px] bg-[#0f62ac]/12" />
+                <Image src="/images/ufrj-logo.png" alt="UFRJ" width={62} height={62} className="h-[48px] w-auto object-contain" />
+              </div>
+              <p className="mt-4 text-[13px] leading-relaxed text-[#6b7280]">
+                Projeto desenvolvido com apoio da Pró-reitoria de Planejamento e da PROPPI da Universidade Federal Fluminense.
+              </p>
             </div>
           </div>
-        </div>
-      </main>
+        </main>
+      </div>
     </div>
   );
 }
