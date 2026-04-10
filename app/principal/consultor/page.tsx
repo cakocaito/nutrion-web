@@ -1,15 +1,15 @@
 "use client";
 
-import Image from "next/image";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
 import { useAuth } from "@/context/AuthContext";
 import { Sidebar, MobileSidebar, TopBar } from "@/app/projeto/components";
+import { apiFetch } from "@/lib/api";
 
-const desenvolvedores = [
-  "João Gabriel Mattos Otogali",
-  "Caio Marcio de Souza Santos da Silva",
-];
+interface Avaliacao {
+  id: number;
+  status: "Agendada" | "EmAndamento" | "Concluida" | "Cancelada";
+}
 
 const pesquisadores = [
   { nome: "Maria das Graças G. A. Medeiros", faculdade: "Nutrição" },
@@ -22,11 +22,48 @@ const pesquisadores = [
   { nome: "Fernanda Silveira dos Anjos Bainha", faculdade: "Nutrição" },
 ];
 
+function StatCard({
+  label,
+  value,
+  color,
+  loading,
+}: {
+  label: string;
+  value: number;
+  color: string;
+  loading: boolean;
+}) {
+  return (
+    <div className="rounded-2xl border border-[#e5eaf0] bg-white p-5">
+      <p className="text-[11px] font-semibold uppercase tracking-widest text-[#9ca3af]">{label}</p>
+      {loading ? (
+        <div className="mt-2 h-8 w-12 animate-pulse rounded-lg bg-[#f0f4f8]" />
+      ) : (
+        <p className={`mt-1 text-[32px] font-bold leading-none ${color}`}>{value}</p>
+      )}
+    </div>
+  );
+}
+
 export default function PrincipalConsultor() {
   const router = useRouter();
   const { user } = useAuth();
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [avaliacoes, setAvaliacoes] = useState<Avaliacao[]>([]);
+  const [loadingMetrics, setLoadingMetrics] = useState(true);
+
+  useEffect(() => {
+    apiFetch("/api/avaliacoes")
+      .then((data) => setAvaliacoes(data))
+      .catch(() => {})
+      .finally(() => setLoadingMetrics(false));
+  }, []);
+
+  const total = avaliacoes.length;
+  const agendadas = avaliacoes.filter((a) => a.status === "Agendada").length;
+  const emAndamento = avaliacoes.filter((a) => a.status === "EmAndamento").length;
+  const concluidas = avaliacoes.filter((a) => a.status === "Concluida").length;
 
   return (
     <div className="flex min-h-screen bg-[#f8fafb]">
@@ -68,7 +105,15 @@ export default function PrincipalConsultor() {
             </button>
           </div>
 
-          <div className="mt-6 grid gap-4 lg:grid-cols-3">
+          {/* Métricas */}
+          <div className="mt-5 grid grid-cols-2 gap-3 lg:grid-cols-4">
+            <StatCard label="Total" value={total} color="text-[#2e2e2e]" loading={loadingMetrics} />
+            <StatCard label="Agendadas" value={agendadas} color="text-amber-500" loading={loadingMetrics} />
+            <StatCard label="Em andamento" value={emAndamento} color="text-[#0f62ac]" loading={loadingMetrics} />
+            <StatCard label="Concluídas" value={concluidas} color="text-emerald-500" loading={loadingMetrics} />
+          </div>
+
+          <div className="mt-4 grid gap-4 lg:grid-cols-3">
             {/* Sobre o projeto — ocupa 2 colunas */}
             <div className="rounded-2xl border border-[#e5eaf0] bg-white p-6 lg:col-span-2">
               <p className="text-[11px] font-semibold uppercase tracking-widest text-[#0f62ac]">
@@ -114,39 +159,24 @@ export default function PrincipalConsultor() {
               </a>
             </div>
 
-            {/* Instituições parceiras — 1 coluna */}
+            {/* Onde já foi utilizado — 1 coluna */}
             <div className="rounded-2xl border border-[#e5eaf0] bg-white p-6">
               <p className="text-[11px] font-semibold uppercase tracking-widest text-[#0f62ac]">
-                Instituições parceiras
+                Onde já foi utilizado
               </p>
-              <div className="mt-5 flex flex-col gap-5">
-                <div className="flex items-center gap-3">
-                  <Image src="/images/uff-shield.png" alt="UFF" width={40} height={40} className="h-[38px] w-auto object-contain" />
-                  <Image src="/images/partner-logo.svg" alt="Universidade Federal Fluminense" width={110} height={26} className="h-[22px] w-auto object-contain" />
-                </div>
-                <div className="h-px bg-[#e5eaf0]" />
-                <Image src="/images/ufrj-logo.png" alt="UFRJ" width={56} height={56} className="h-[44px] w-auto object-contain" />
-              </div>
-              <p className="mt-5 text-[12px] leading-relaxed text-[#9ca3af]">
-                Com apoio da Pró-reitoria de Planejamento e da PROPPI da UFF.
-              </p>
-            </div>
-
-            {/* Desenvolvimento do sistema */}
-            <div className="rounded-2xl border border-[#e5eaf0] bg-white p-6 lg:col-span-3">
-              <p className="text-[11px] font-semibold uppercase tracking-widest text-[#0f62ac]">
-                Desenvolvimento do sistema
-              </p>
-              <div className="mt-4 flex flex-wrap gap-3">
-                {desenvolvedores.map((nome) => (
-                  <div key={nome} className="flex items-center gap-3 rounded-xl bg-[#f8fafb] px-4 py-3">
-                    <div className="flex size-8 items-center justify-center rounded-full bg-[#0f62ac] text-[12px] font-bold text-white">
-                      {nome.split(" ").slice(0, 2).map((n) => n[0]).join("")}
-                    </div>
-                    <p className="text-[13px] font-semibold text-[#2e2e2e]">{nome}</p>
-                  </div>
+              <ul className="mt-4 flex flex-col gap-2.5">
+                {[
+                  "Navio de Pesquisa em Ciências do Mar — UFF",
+                  "Coluni UFF",
+                  "Restaurante Universitário da UFF",
+                  "Batalhão da Polícia Militar do Rio de Janeiro",
+                ].map((local) => (
+                  <li key={local} className="flex items-start gap-2 text-[13px] text-[#4b5563]">
+                    <span className="mt-1.5 size-1.5 shrink-0 rounded-full bg-[#0f62ac]" />
+                    {local}
+                  </li>
                 ))}
-              </div>
+              </ul>
             </div>
 
             {/* Pesquisadores envolvidos — largura total */}
@@ -165,6 +195,11 @@ export default function PrincipalConsultor() {
               </div>
             </div>
           </div>
+
+          {/* Footer */}
+          <p className="mt-6 text-center text-[12px] text-[#c4cdd6]">
+            Desenvolvido por João Gabriel Otogali e Caio Marcio da Silva · Alunos do Instituto de Computação — UFF, 2026
+          </p>
         </main>
       </div>
     </div>
