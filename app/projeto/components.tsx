@@ -247,8 +247,8 @@ export function Sidebar({
     router.push("/");
   }
 
-  const isHome = pathname === `/principal/${role}`;
-  const isAvaliacoes = pathname.startsWith(`/projeto/${role}`);
+  const isHome = pathname === "/home";
+  const isAvaliacoes = pathname === "/avaliacoes" || pathname.startsWith(`/projeto/${role}`);
 
   return (
     <aside
@@ -273,14 +273,14 @@ export function Sidebar({
           label="Início"
           active={isHome}
           collapsed={collapsed}
-          onClick={() => router.push(`/principal/${role}`)}
+          onClick={() => router.push("/home")}
         />
         <SidebarItem
           icon={<BranchIcon />}
           label="Avaliações"
           active={isAvaliacoes}
           collapsed={collapsed}
-          onClick={() => router.push(`/projeto/${role}`)}
+          onClick={() => router.push("/avaliacoes")}
         />
         <SidebarItem
           icon={<SettingsIcon />}
@@ -373,7 +373,7 @@ export function MobileSidebar({
   }
 
   const isHome = pathname === `/principal/${role}`;
-  const isAvaliacoes = pathname.startsWith(`/projeto/${role}`);
+  const isAvaliacoes = pathname === "/avaliacoes" || pathname.startsWith(`/projeto/${role}`);
 
   if (!open) return null;
 
@@ -645,7 +645,7 @@ export function TopBar({
                       key={`${n.id}-${n.titulo}`}
                       onClick={() => {
                         setBellOpen(false);
-                        router.push(n.temRelatorio ? `/relatorio/${n.id}` : `/projeto/${role}`);
+                        router.push(n.temRelatorio ? `/relatorio/${n.id}` : "/avaliacoes");
                       }}
                       className="flex w-full items-start gap-3 px-4 py-3 text-left transition-colors hover:bg-[#f8fafb]"
                     >

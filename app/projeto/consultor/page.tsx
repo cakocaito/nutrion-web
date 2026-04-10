@@ -107,7 +107,6 @@ function NovaAvaliacaoModal({
     }
   }
 
-  // Tela de confirmação após criar
   if (codigoCriado) {
     return (
       <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
@@ -158,7 +157,6 @@ function NovaAvaliacaoModal({
         </p>
 
         <div className="mt-5 flex flex-col gap-4">
-          {/* CNPJ */}
           <div>
             <label className="mb-1.5 block text-[13px] font-semibold text-[#2e2e2e]">
               CNPJ do estabelecimento
@@ -181,7 +179,6 @@ function NovaAvaliacaoModal({
             </div>
           </div>
 
-          {/* Estabelecimento encontrado */}
           {estabelecimento && (
             <div className="rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-3">
               <p className="text-[14px] font-semibold text-emerald-700">{estabelecimento.nome}</p>
@@ -191,7 +188,6 @@ function NovaAvaliacaoModal({
             </div>
           )}
 
-          {/* Data */}
           <div>
             <label className="mb-1.5 block text-[13px] font-semibold text-[#2e2e2e]">
               Data agendada
@@ -271,7 +267,6 @@ export default function ProjetoConsultor() {
         />
       )}
 
-      {/* Desktop Sidebar */}
       <div className="hidden lg:block">
         <Sidebar
           role="consultor"
@@ -280,14 +275,12 @@ export default function ProjetoConsultor() {
         />
       </div>
 
-      {/* Mobile Sidebar */}
       <MobileSidebar
         role="consultor"
         open={mobileMenuOpen}
         onClose={() => setMobileMenuOpen(false)}
       />
 
-      {/* Main Content */}
       <div
         className={`flex flex-1 flex-col transition-all duration-300 ${sidebarCollapsed ? "lg:ml-[68px]" : "lg:ml-[240px]"}`}
       >
@@ -297,7 +290,6 @@ export default function ProjetoConsultor() {
         />
 
         <main className="flex-1 px-4 py-6 sm:px-6 lg:px-8">
-          {/* Page Header */}
           <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <div>
               <h1 className="font-[family-name:var(--font-heading)] text-[22px] font-bold text-[#2e2e2e] sm:text-[26px]">
@@ -329,7 +321,6 @@ export default function ProjetoConsultor() {
             </div>
           </div>
 
-          {/* Painel de filtros */}
           {filtroAberto && (
             <div className="mt-3 rounded-2xl border border-[#e5eaf0] bg-white p-4">
               <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
@@ -369,7 +360,6 @@ export default function ProjetoConsultor() {
             </div>
           )}
 
-          {/* Project Grid */}
           <div className="mt-4 grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
             {loading && (
               <p className="text-[14px] text-[#6b7280]">Carregando avaliações...</p>

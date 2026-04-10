@@ -27,9 +27,7 @@ export default function Login() {
       const user = await login(email, password);
       setUser(user);
 
-      if (user.role === "Consultor") router.push("/principal/consultor");
-      else if (user.role === "Responsavel") router.push("/principal/responsavel");
-      else router.push("/principal/consultor");
+      router.push("/home");
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : "Erro ao fazer login.");
     } finally {
