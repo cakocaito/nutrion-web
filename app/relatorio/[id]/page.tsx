@@ -90,24 +90,51 @@ export default function RelatorioPage() {
 
   return (
     <div className="flex min-h-screen bg-[#f8fafb]">
-      <div className="hidden lg:block">
+      <div className="no-print hidden lg:block">
         <Sidebar role={role} collapsed={sidebarCollapsed} onToggle={() => setSidebarCollapsed(!sidebarCollapsed)} />
       </div>
-      <MobileSidebar role={role} open={mobileMenuOpen} onClose={() => setMobileMenuOpen(false)} />
+      <div className="no-print">
+        <MobileSidebar role={role} open={mobileMenuOpen} onClose={() => setMobileMenuOpen(false)} />
+      </div>
 
-      <div className={`flex flex-1 flex-col transition-all duration-300 ${sidebarCollapsed ? "lg:ml-[68px]" : "lg:ml-[240px]"}`}>
-        <TopBar role={role} onMenuToggle={() => setMobileMenuOpen(true)} />
+      <div className={`print-area flex flex-1 flex-col transition-all duration-300 ${sidebarCollapsed ? "lg:ml-[68px]" : "lg:ml-[240px]"}`}>
+        <div className="no-print">
+          <TopBar role={role} onMenuToggle={() => setMobileMenuOpen(true)} />
+        </div>
 
         <main className="flex-1 px-4 py-6 sm:px-6 lg:px-8">
-          <button
-            onClick={() => router.back()}
-            className="mb-5 inline-flex items-center gap-1.5 text-[13px] font-medium text-[#6b7280] transition-colors hover:text-[#2e2e2e]"
-          >
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-              <polyline points="15 18 9 12 15 6" />
-            </svg>
-            Voltar
-          </button>
+          <div className="no-print mb-5 flex items-center justify-between">
+            <button
+              onClick={() => router.back()}
+              className="inline-flex items-center gap-1.5 text-[13px] font-medium text-[#6b7280] transition-colors hover:text-[#2e2e2e]"
+            >
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <polyline points="15 18 9 12 15 6" />
+              </svg>
+              Voltar
+            </button>
+            {relatorio && (
+              <button
+                onClick={() => window.print()}
+                className="inline-flex items-center gap-2 rounded-full border border-[#e5eaf0] bg-white px-4 py-2 text-[13px] font-semibold text-[#2e2e2e] transition-colors hover:border-[#0f62ac]/30 hover:text-[#0f62ac]"
+              >
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <polyline points="6 9 6 2 18 2 18 9" />
+                  <path d="M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2" />
+                  <rect x="6" y="14" width="12" height="8" />
+                </svg>
+                Exportar PDF
+              </button>
+            )}
+          </div>
+
+          <style>{`
+            @media print {
+              .no-print { display: none !important; }
+              body { background: white !important; }
+              .print-area { margin-left: 0 !important; }
+            }
+          `}</style>
 
           {loading && (
             <div className="flex items-center gap-3 text-[14px] text-[#6b7280]">
