@@ -1,7 +1,7 @@
 "use client";
 
 import { usePathname, useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useAuth } from "@/context/AuthContext";
 
 /* ───── Icons ───── */
@@ -402,6 +402,24 @@ export function MobileSidebar({
 
 /* ───── Top Bar ───── */
 
+const SUPORTE_WHATSAPP = process.env.NEXT_PUBLIC_SUPORTE_WHATSAPP ?? "";
+
+function UserAvatar({ name }: { name?: string }) {
+  const initials = name
+    ? name
+        .split(" ")
+        .slice(0, 2)
+        .map((n) => n[0])
+        .join("")
+        .toUpperCase()
+    : "?";
+  return (
+    <div className="flex size-[34px] items-center justify-center rounded-full bg-[#0f62ac] text-[13px] font-bold text-white">
+      {initials}
+    </div>
+  );
+}
+
 export function TopBar({
   role,
   onMenuToggle,
@@ -409,6 +427,27 @@ export function TopBar({
   role: "consultor" | "responsavel";
   onMenuToggle: () => void;
 }) {
+  const { user, logout } = useAuth();
+  const router = useRouter();
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    function handleClickOutside(e: MouseEvent) {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
+        setDropdownOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  function handleLogout() {
+    setDropdownOpen(false);
+    logout();
+    router.push("/");
+  }
+
   return (
     <header className="flex h-[64px] items-center justify-between border-b border-[#0f62ac]/10 bg-white px-4 sm:px-6">
       {/* Hamburger (mobile) */}
@@ -435,15 +474,74 @@ export function TopBar({
       </div>
 
       {/* Right actions */}
-      <div className="ml-4 flex items-center gap-3">
-        <button className="flex size-[36px] items-center justify-center rounded-full transition-colors hover:bg-gray-100">
-          <HelpIcon />
-        </button>
-        <button className="relative flex size-[36px] items-center justify-center rounded-full transition-colors hover:bg-gray-100">
-          <BellIcon />
-          <span className="absolute right-1.5 top-1.5 size-2 rounded-full bg-[#f25050]" />
-        </button>
-        <div className="ml-1 size-[34px] rounded-full bg-[#0f62ac]/15" />
+      <div className="ml-4 flex items-center gap-2">
+        {/* Avatar + dropdown */}
+        <div className="relative" ref={dropdownRef}>
+          <button
+            onClick={() => setDropdownOpen((v) => !v)}
+            className="ml-1 flex items-center gap-2 rounded-full p-0.5 transition-colors hover:bg-gray-100"
+          >
+            <UserAvatar name={user?.nomeCompleto} />
+          </button>
+
+          {dropdownOpen && (
+            <div className="absolute right-0 top-[calc(100%+8px)] z-50 w-[220px] overflow-hidden rounded-2xl border border-[#e5eaf0] bg-white shadow-lg">
+              {/* Cabeçalho do usuário */}
+              <div className="border-b border-[#e5eaf0] px-4 py-3">
+                <p className="truncate text-[14px] font-semibold text-[#2e2e2e]">
+                  {user?.nomeCompleto ?? "Usuário"}
+                </p>
+                <p className="truncate text-[12px] text-[#9ca3af]">{user?.email ?? ""}</p>
+                <span className="mt-1.5 inline-block rounded-full bg-[#0f62ac]/10 px-2 py-0.5 text-[11px] font-semibold text-[#0f62ac]">
+                  {user?.role ?? ""}
+                </span>
+              </div>
+
+              {/* Ações */}
+              <div className="p-1.5">
+                <button
+                  onClick={() => { setDropdownOpen(false); router.push("/perfil"); }}
+                  className="flex w-full items-center gap-2.5 rounded-xl px-3 py-2 text-[13px] font-medium text-[#2e2e2e] transition-colors hover:bg-[#f8fafb]"
+                >
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#6b7280" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2" />
+                    <circle cx="12" cy="7" r="4" />
+                  </svg>
+                  Meu perfil
+                </button>
+
+                {SUPORTE_WHATSAPP && (
+                  <a
+                    href={`https://wa.me/${SUPORTE_WHATSAPP}?text=Olá,%20preciso%20de%20suporte%20no%20NutriSec`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    onClick={() => setDropdownOpen(false)}
+                    className="flex w-full items-center gap-2.5 rounded-xl px-3 py-2 text-[13px] font-medium text-[#2e2e2e] transition-colors hover:bg-[#f8fafb]"
+                  >
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#6b7280" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z" />
+                    </svg>
+                    Falar com suporte
+                  </a>
+                )}
+
+                <div className="my-1 border-t border-[#e5eaf0]" />
+
+                <button
+                  onClick={handleLogout}
+                  className="flex w-full items-center gap-2.5 rounded-xl px-3 py-2 text-[13px] font-medium text-[#f25050] transition-colors hover:bg-red-50"
+                >
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#f25050" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4" />
+                    <polyline points="16 17 21 12 16 7" />
+                    <line x1="21" y1="12" x2="9" y2="12" />
+                  </svg>
+                  Sair
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
       </div>
     </header>
   );
