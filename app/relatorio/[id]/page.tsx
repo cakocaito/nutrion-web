@@ -61,6 +61,64 @@ function CustomTooltip({ active, payload, label }: any) {
   );
 }
 
+function ClassificacaoModal({ onClose }: { onClose: () => void }) {
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4 backdrop-blur-sm">
+      <div className="w-full max-w-[500px] overflow-hidden rounded-2xl bg-white shadow-2xl">
+        <div className="flex items-center justify-between border-b border-[#e5eaf0] px-6 py-4">
+          <h2 className="text-[15px] font-bold text-[#2e2e2e]">Sistema de classificação</h2>
+          <button onClick={onClose} className="flex size-7 items-center justify-center rounded-full text-[#9ca3af] hover:bg-gray-100">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" />
+            </svg>
+          </button>
+        </div>
+        <div className="space-y-3 p-6">
+          {[
+            {
+              label: "Categoria A",
+              color: "border-emerald-200 bg-emerald-50 text-emerald-700",
+              dot: "bg-emerald-500",
+              titulo: "Boas condições sanitárias",
+              desc: "O estabelecimento apresenta baixo nível de não conformidades. Pontuação inferior a 13,3 pontos. Indica que as boas práticas estão sendo seguidas adequadamente.",
+            },
+            {
+              label: "Categoria B",
+              color: "border-amber-200 bg-amber-50 text-amber-700",
+              dot: "bg-amber-500",
+              titulo: "Condições regulares",
+              desc: "Nível intermediário de não conformidades. Pontuação entre 13,3 e 502,7 pontos. Requer atenção e implementação de melhorias para evitar riscos sanitários.",
+            },
+            {
+              label: "Categoria C",
+              color: "border-red-200 bg-red-50 text-red-700",
+              dot: "bg-red-500",
+              titulo: "Condições inadequadas",
+              desc: "Alto nível de não conformidades. Pontuação igual ou superior a 502,7 pontos. Exige ação corretiva imediata para garantir a segurança alimentar.",
+            },
+            {
+              label: "Pendente",
+              color: "border-gray-200 bg-gray-50 text-gray-600",
+              dot: "bg-gray-400",
+              titulo: "Critério eliminatório ou pontuação crítica",
+              desc: "Atribuída quando o estabelecimento não cumpre os critérios eliminatórios (relacionados ao abastecimento de água) ou atinge pontuação igual ou superior a 1152,4 pontos.",
+            },
+          ].map((c) => (
+            <div key={c.label} className={`rounded-xl border p-4 ${c.color}`}>
+              <div className="flex items-center gap-2">
+                <span className={`size-2 rounded-full ${c.dot}`} />
+                <span className="text-[13px] font-bold">{c.label}</span>
+                <span className="text-[12px] font-medium opacity-80">— {c.titulo}</span>
+              </div>
+              <p className="mt-1.5 text-[12px] leading-relaxed opacity-80">{c.desc}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function RelatorioPage() {
   const { id } = useParams<{ id: string }>();
   const router = useRouter();
@@ -70,6 +128,7 @@ export default function RelatorioPage() {
   const [relatorio, setRelatorio] = useState<Relatorio | null>(null);
   const [loading, setLoading] = useState(true);
   const [erro, setErro] = useState<string | null>(null);
+  const [modalClassificacao, setModalClassificacao] = useState(false);
 
   const role = (user?.role?.toLowerCase() ?? "consultor") as "consultor" | "responsavel";
 
@@ -149,6 +208,8 @@ export default function RelatorioPage() {
             </div>
           )}
 
+          {modalClassificacao && <ClassificacaoModal onClose={() => setModalClassificacao(false)} />}
+
           {relatorio && cat && (
             <div className="max-w-[860px] space-y-4">
               {/* Header */}
@@ -165,10 +226,23 @@ export default function RelatorioPage() {
                       <span>Gerado em {new Date(relatorio.dataGeracao).toLocaleDateString("pt-BR")}</span>
                     </div>
                   </div>
-                  <span className={`inline-flex shrink-0 items-center gap-2 rounded-xl border px-4 py-2 text-[13px] font-bold ${cat.color}`}>
-                    <span className={`size-2 rounded-full ${cat.dot}`} />
-                    {cat.label}
-                  </span>
+                  <div className="flex shrink-0 items-center gap-2">
+                    <span className={`inline-flex items-center gap-2 rounded-xl border px-4 py-2 text-[13px] font-bold ${cat.color}`}>
+                      <span className={`size-2 rounded-full ${cat.dot}`} />
+                      {cat.label}
+                    </span>
+                    <button
+                      onClick={() => setModalClassificacao(true)}
+                      title="Entender a classificação"
+                      className="flex size-7 items-center justify-center rounded-full border border-[#e5eaf0] bg-white text-[#9ca3af] transition-colors hover:border-[#0f62ac]/30 hover:text-[#0f62ac]"
+                    >
+                      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                        <circle cx="12" cy="12" r="10" />
+                        <path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3" />
+                        <line x1="12" y1="17" x2="12.01" y2="17" />
+                      </svg>
+                    </button>
+                  </div>
                 </div>
                 <p className={`mt-3 text-[13px] font-medium ${cat.color.split(" ")[1]}`}>{cat.desc}</p>
               </div>

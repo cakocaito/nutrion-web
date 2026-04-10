@@ -271,6 +271,13 @@ export function Sidebar({
           collapsed={collapsed}
           onClick={() => router.push("/perfil")}
         />
+        <SidebarItem
+          icon={<HelpIcon />}
+          label="FAQ"
+          active={pathname === "/faq"}
+          collapsed={collapsed}
+          onClick={() => router.push("/faq")}
+        />
       </nav>
 
       {/* Bottom Items */}
@@ -384,6 +391,13 @@ export function MobileSidebar({
             active={pathname === "/perfil"}
             collapsed={false}
             onClick={() => { router.push("/perfil"); onClose(); }}
+          />
+          <SidebarItem
+            icon={<HelpIcon />}
+            label="FAQ"
+            active={pathname === "/faq"}
+            collapsed={false}
+            onClick={() => { router.push("/faq"); onClose(); }}
           />
         </nav>
 

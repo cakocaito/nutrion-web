@@ -179,6 +179,30 @@ export default function PrincipalConsultor() {
               </ul>
             </div>
 
+            {/* Classificações — largura total */}
+            <div className="rounded-2xl border border-[#e5eaf0] bg-white p-6 lg:col-span-3">
+              <p className="text-[11px] font-semibold uppercase tracking-widest text-[#0f62ac]">
+                Sistema de classificação
+              </p>
+              <p className="mt-1 text-[12px] text-[#9ca3af]">Resultado gerado após o preenchimento do checklist no REDCap</p>
+              <div className="mt-4 grid grid-cols-2 gap-3 lg:grid-cols-4">
+                {[
+                  { label: "Categoria A", color: "border-emerald-200 bg-emerald-50 text-emerald-700", dot: "bg-emerald-500", desc: "Boas condições sanitárias. Pontuação < 13,3." },
+                  { label: "Categoria B", color: "border-amber-200 bg-amber-50 text-amber-700", dot: "bg-amber-500", desc: "Condições regulares. Pontuação entre 13,3 e 502,7." },
+                  { label: "Categoria C", color: "border-red-200 bg-red-50 text-red-700", dot: "bg-red-500", desc: "Condições inadequadas. Pontuação ≥ 502,7." },
+                  { label: "Pendente", color: "border-gray-200 bg-gray-50 text-gray-600", dot: "bg-gray-400", desc: "Critério eliminatório não cumprido ou pontuação ≥ 1152,4." },
+                ].map((c) => (
+                  <div key={c.label} className={`rounded-xl border p-4 ${c.color}`}>
+                    <div className="flex items-center gap-2">
+                      <span className={`size-2 rounded-full ${c.dot}`} />
+                      <span className="text-[13px] font-bold">{c.label}</span>
+                    </div>
+                    <p className="mt-2 text-[12px] leading-relaxed opacity-80">{c.desc}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+
             {/* Pesquisadores envolvidos — largura total */}
             <div className="rounded-2xl border border-[#e5eaf0] bg-white p-6 lg:col-span-3">
               <p className="text-[11px] font-semibold uppercase tracking-widest text-[#0f62ac]">
