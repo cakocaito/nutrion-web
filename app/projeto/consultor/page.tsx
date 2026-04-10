@@ -234,6 +234,9 @@ export default function ProjetoConsultor() {
   const [loading, setLoading] = useState(true);
   const [erro, setErro] = useState<string | null>(null);
   const [modalAberto, setModalAberto] = useState(false);
+  const [filtroAberto, setFiltroAberto] = useState(false);
+  const [busca, setBusca] = useState("");
+  const [filtroStatus, setFiltroStatus] = useState<string>("todos");
 
   function carregarAvaliacoes() {
     setLoading(true);
@@ -246,6 +249,18 @@ export default function ProjetoConsultor() {
   useEffect(() => {
     carregarAvaliacoes();
   }, []);
+
+  const avaliacoesFiltradas = avaliacoes.filter((a) => {
+    const matchBusca = a.estabelecimentoNome.toLowerCase().includes(busca.toLowerCase());
+    const matchStatus =
+      filtroStatus === "todos"
+        ? a.status !== "Cancelada"
+        : (filtroStatus === "pendente" && a.status === "Agendada") ||
+          (filtroStatus === "em_andamento" && a.status === "EmAndamento") ||
+          (filtroStatus === "concluido" && a.status === "Concluida") ||
+          (filtroStatus === "cancelada" && a.status === "Cancelada");
+    return matchBusca && matchStatus;
+  });
 
   return (
     <div className="flex min-h-screen bg-[#f8fafb]">
@@ -286,16 +301,24 @@ export default function ProjetoConsultor() {
           <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <div>
               <h1 className="font-[family-name:var(--font-heading)] text-[22px] font-bold text-[#2e2e2e] sm:text-[26px]">
-                Meus Projetos
+                Avaliações
               </h1>
               <p className="mt-1 text-[14px] font-medium text-[#6b7280]">
-                Consultor — Avaliações em andamento
+                {avaliacoesFiltradas.length} de {avaliacoes.length} avaliações
               </p>
             </div>
             <div className="flex items-center gap-3">
-              <button className="inline-flex h-[38px] items-center gap-2 rounded-full border border-[#9e9e9e]/20 bg-white px-4 text-[13px] font-semibold text-[#6b7280] transition-colors hover:border-[#0f62ac]/20">
+              <button
+                onClick={() => setFiltroAberto((v) => !v)}
+                className={`inline-flex h-[38px] items-center gap-2 rounded-full border px-4 text-[13px] font-semibold transition-colors ${filtroAberto || filtroStatus !== "todos" || busca ? "border-[#0f62ac]/30 bg-[#0f62ac]/5 text-[#0f62ac]" : "border-[#9e9e9e]/20 bg-white text-[#6b7280] hover:border-[#0f62ac]/20"}`}
+              >
                 <FilterIcon />
                 Filtros
+                {(filtroStatus !== "todos" || busca) && (
+                  <span className="flex size-4 items-center justify-center rounded-full bg-[#0f62ac] text-[9px] font-bold text-white">
+                    {(filtroStatus !== "todos" ? 1 : 0) + (busca ? 1 : 0)}
+                  </span>
+                )}
               </button>
               <button
                 onClick={() => setModalAberto(true)}
@@ -306,18 +329,58 @@ export default function ProjetoConsultor() {
             </div>
           </div>
 
+          {/* Painel de filtros */}
+          {filtroAberto && (
+            <div className="mt-3 rounded-2xl border border-[#e5eaf0] bg-white p-4">
+              <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+                <input
+                  type="text"
+                  placeholder="Buscar por estabelecimento..."
+                  value={busca}
+                  onChange={(e) => setBusca(e.target.value)}
+                  className="h-[36px] flex-1 rounded-full border border-[#e5eaf0] bg-[#f8fafb] px-4 text-[13px] text-[#2e2e2e] placeholder-[#9ca3af] outline-none focus:border-[#0f62ac]/30"
+                />
+                <div className="flex flex-wrap gap-1.5">
+                  {[
+                    { key: "todos", label: "Todos" },
+                    { key: "pendente", label: "Agendadas" },
+                    { key: "em_andamento", label: "Em andamento" },
+                    { key: "concluido", label: "Concluídas" },
+                    { key: "cancelada", label: "Canceladas" },
+                  ].map((op) => (
+                    <button
+                      key={op.key}
+                      onClick={() => setFiltroStatus(op.key)}
+                      className={`h-[30px] rounded-full px-3 text-[12px] font-semibold transition-colors ${filtroStatus === op.key ? "bg-[#0f62ac] text-white" : "bg-[#f8fafb] text-[#6b7280] hover:bg-[#0f62ac]/10"}`}
+                    >
+                      {op.label}
+                    </button>
+                  ))}
+                </div>
+                {(filtroStatus !== "todos" || busca) && (
+                  <button
+                    onClick={() => { setBusca(""); setFiltroStatus("todos"); }}
+                    className="text-[12px] font-medium text-[#9ca3af] transition-colors hover:text-[#f25050]"
+                  >
+                    Limpar
+                  </button>
+                )}
+              </div>
+            </div>
+          )}
+
           {/* Project Grid */}
-          <div className="mt-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+          <div className="mt-4 grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
             {loading && (
               <p className="text-[14px] text-[#6b7280]">Carregando avaliações...</p>
             )}
             {erro && (
               <p className="text-[14px] text-[#f25050]">{erro}</p>
             )}
-            {!loading && !erro && avaliacoes.length === 0 && (
+            {!loading && !erro && avaliacoesFiltradas.length === 0 && (
               <p className="text-[14px] text-[#6b7280]">Nenhuma avaliação encontrada.</p>
             )}
-            {avaliacoes.map((a) => (
+            {avaliacoesFiltradas.map((a) => (
               <ProjectCard
                 key={a.id}
                 id={a.id}
