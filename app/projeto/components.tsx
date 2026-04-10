@@ -421,6 +421,70 @@ function UserAvatar({ name }: { name?: string }) {
   );
 }
 
+interface AvaliacaoNotif {
+  id: number;
+  estabelecimentoNome: string;
+  status: string;
+  dataRealizacao: string | null;
+  dataAgendada: string;
+}
+
+interface NotifItem {
+  id: number;
+  titulo: string;
+  descricao: string;
+  dataRelatorio?: string;
+  temRelatorio: boolean;
+}
+
+function notifStateKey(email: string) {
+  return `nutrisec_notif_state_${email}`;
+}
+
+function buildNotifs(
+  current: AvaliacaoNotif[],
+  prevState: Record<number, string>,
+  isResponsavel: boolean
+): NotifItem[] {
+  const items: NotifItem[] = [];
+
+  for (const a of current) {
+    const prevStatus = prevState[a.id];
+    const isNew = prevStatus === undefined;
+    const changed = !isNew && prevStatus !== a.status;
+
+    if (!isNew && !changed) continue;
+
+    if (a.status === "Concluida") {
+      items.push({
+        id: a.id,
+        titulo: "Avaliação concluída",
+        descricao: `${a.estabelecimentoNome} — relatório disponível`,
+        dataRelatorio: a.dataRealizacao ?? a.dataAgendada,
+        temRelatorio: true,
+      });
+    } else if (a.status === "EmAndamento" && isResponsavel) {
+      items.push({
+        id: a.id,
+        titulo: "Avaliação iniciada",
+        descricao: `${a.estabelecimentoNome}`,
+        dataRelatorio: a.dataAgendada,
+        temRelatorio: false,
+      });
+    } else if (a.status === "Agendada" && isResponsavel && isNew) {
+      items.push({
+        id: a.id,
+        titulo: "Nova avaliação agendada",
+        descricao: `${a.estabelecimentoNome}`,
+        dataRelatorio: a.dataAgendada,
+        temRelatorio: false,
+      });
+    }
+  }
+
+  return items;
+}
+
 export function TopBar({
   role,
   onMenuToggle,
@@ -431,13 +495,35 @@ export function TopBar({
   const { user, logout } = useAuth();
   const router = useRouter();
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [bellOpen, setBellOpen] = useState(false);
+  const [notifs, setNotifs] = useState<NotifItem[]>([]);
+  const [currentState, setCurrentState] = useState<Record<number, string>>({});
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const bellRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!user?.email) return;
+    const isResponsavel = user.role?.toLowerCase() === "responsavel";
+    const savedState: Record<number, string> = JSON.parse(
+      localStorage.getItem(notifStateKey(user.email)) ?? "{}"
+    );
+
+    apiFetch("/api/avaliacoes")
+      .then((data: AvaliacaoNotif[]) => {
+        const newState: Record<number, string> = {};
+        data.forEach((a) => { newState[a.id] = a.status; });
+        setCurrentState(newState);
+        setNotifs(buildNotifs(data, savedState, isResponsavel));
+      })
+      .catch(() => {});
+  }, [user?.email]);
 
   useEffect(() => {
     function handleClickOutside(e: MouseEvent) {
-      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node))
         setDropdownOpen(false);
-      }
+      if (bellRef.current && !bellRef.current.contains(e.target as Node))
+        setBellOpen(false);
     }
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
@@ -447,6 +533,14 @@ export function TopBar({
     setDropdownOpen(false);
     logout();
     router.push("/");
+  }
+
+  function handleBellOpen() {
+    setBellOpen((v) => !v);
+    if (!bellOpen && user?.email) {
+      localStorage.setItem(notifStateKey(user.email), JSON.stringify(currentState));
+      setNotifs([]);
+    }
   }
 
   return (
@@ -476,6 +570,57 @@ export function TopBar({
 
       {/* Right actions */}
       <div className="ml-4 flex items-center gap-2">
+
+        {/* Bell */}
+        <div className="relative" ref={bellRef}>
+          <button
+            onClick={handleBellOpen}
+            className="relative flex size-[36px] items-center justify-center rounded-full transition-colors hover:bg-gray-100"
+          >
+            <BellIcon />
+            {notifs.length > 0 && (
+              <span className="absolute right-1 top-1 flex size-[16px] items-center justify-center rounded-full bg-[#f25050] text-[9px] font-bold text-white">
+                {notifs.length > 9 ? "9+" : notifs.length}
+              </span>
+            )}
+          </button>
+
+          {bellOpen && (
+            <div className="absolute right-0 top-[calc(100%+8px)] z-50 w-[280px] overflow-hidden rounded-2xl border border-[#e5eaf0] bg-white shadow-lg">
+              <div className="border-b border-[#e5eaf0] px-4 py-3">
+                <p className="text-[13px] font-semibold text-[#2e2e2e]">Notificações</p>
+              </div>
+              <div className="max-h-[280px] overflow-y-auto">
+                {notifs.length === 0 ? (
+                  <p className="px-4 py-6 text-center text-[13px] text-[#9ca3af]">Nenhuma novidade por aqui.</p>
+                ) : (
+                  notifs.map((n) => (
+                    <button
+                      key={`${n.id}-${n.titulo}`}
+                      onClick={() => {
+                        setBellOpen(false);
+                        router.push(n.temRelatorio ? `/relatorio/${n.id}` : `/projeto/${role}`);
+                      }}
+                      className="flex w-full items-start gap-3 px-4 py-3 text-left transition-colors hover:bg-[#f8fafb]"
+                    >
+                      <span className={`mt-1 size-2 shrink-0 rounded-full ${n.temRelatorio ? "bg-emerald-500" : "bg-[#0f62ac]"}`} />
+                      <div>
+                        <p className="text-[13px] font-semibold text-[#2e2e2e]">{n.titulo}</p>
+                        <p className="text-[12px] text-[#6b7280]">{n.descricao}</p>
+                        {n.dataRelatorio && (
+                          <p className="mt-0.5 text-[11px] text-[#9ca3af]">
+                            {new Date(n.dataRelatorio).toLocaleDateString("pt-BR")}
+                          </p>
+                        )}
+                      </div>
+                    </button>
+                  ))
+                )}
+              </div>
+            </div>
+          )}
+        </div>
+
         {/* Avatar + dropdown */}
         <div className="relative" ref={dropdownRef}>
           <button
