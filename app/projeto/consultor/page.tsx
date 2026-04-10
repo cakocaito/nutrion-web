@@ -326,6 +326,7 @@ export default function ProjetoConsultor() {
                 status={mapStatus(a.status)}
                 date={new Date(a.dataAgendada).toLocaleDateString("pt-BR", { month: "short", year: "numeric" })}
                 members={0}
+                temRelatorio={a.temRelatorio}
               />
             ))}
           </div>

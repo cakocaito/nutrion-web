@@ -555,6 +555,7 @@ export function ProjectCard({
   institution,
   status,
   date,
+  temRelatorio,
 }: {
   id?: number;
   title: string;
@@ -562,12 +563,12 @@ export function ProjectCard({
   status: "em_andamento" | "concluido" | "pendente";
   date: string;
   members: number;
+  temRelatorio?: boolean;
 }) {
+  const router = useRouter();
+
   const statusMap = {
-    em_andamento: {
-      label: "Em andamento",
-      color: "bg-[#0f62ac]/10 text-[#0f62ac]",
-    },
+    em_andamento: { label: "Em andamento", color: "bg-[#0f62ac]/10 text-[#0f62ac]" },
     concluido: { label: "Concluído", color: "bg-emerald-50 text-emerald-600" },
     pendente: { label: "Pendente", color: "bg-amber-50 text-amber-600" },
   };
@@ -585,9 +586,7 @@ export function ProjectCard({
             {institution}
           </p>
         </div>
-        <span
-          className={`shrink-0 rounded-full px-3 py-1 text-[11px] font-semibold ${s.color}`}
-        >
+        <span className={`shrink-0 rounded-full px-3 py-1 text-[11px] font-semibold ${s.color}`}>
           {s.label}
         </span>
       </div>
@@ -597,6 +596,18 @@ export function ProjectCard({
           <span className="rounded-md bg-[#f1f8fc] px-2 py-0.5 font-mono font-semibold text-[#0f62ac]">
             id_pesquisa: {id}
           </span>
+        )}
+        {temRelatorio && id && (
+          <button
+            onClick={() => router.push(`/relatorio/${id}`)}
+            className="inline-flex items-center gap-1.5 rounded-full bg-emerald-50 px-3 py-1 text-[11px] font-semibold text-emerald-600 transition-colors hover:bg-emerald-100"
+          >
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" />
+              <polyline points="14 2 14 8 20 8" />
+            </svg>
+            Ver relatório
+          </button>
         )}
       </div>
     </div>
