@@ -192,6 +192,24 @@ export function FilterIcon() {
   );
 }
 
+export function MobileIcon() {
+  return (
+    <svg
+      width="20"
+      height="20"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="#6b7280"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <rect x="5" y="2" width="14" height="20" rx="2" ry="2" />
+      <line x1="12" y1="18" x2="12.01" y2="18" />
+    </svg>
+  );
+}
+
 export function ChevronLeftIcon() {
   return (
     <svg
@@ -277,6 +295,13 @@ export function Sidebar({
           active={pathname === "/faq"}
           collapsed={collapsed}
           onClick={() => router.push("/faq")}
+        />
+        <SidebarItem
+          icon={<MobileIcon />}
+          label="REDCap Mobile"
+          active={pathname === "/redcap"}
+          collapsed={collapsed}
+          onClick={() => router.push("/redcap")}
         />
       </nav>
 
@@ -398,6 +423,13 @@ export function MobileSidebar({
             active={pathname === "/faq"}
             collapsed={false}
             onClick={() => { router.push("/faq"); onClose(); }}
+          />
+          <SidebarItem
+            icon={<MobileIcon />}
+            label="REDCap Mobile"
+            active={pathname === "/redcap"}
+            collapsed={false}
+            onClick={() => { router.push("/redcap"); onClose(); }}
           />
         </nav>
 
