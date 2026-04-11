@@ -1,14 +1,27 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useAuth } from "@/context/AuthContext";
 import { Sidebar, MobileSidebar, TopBar } from "@/app/projeto/components";
 import { apiFetch } from "@/lib/api";
+
+interface MeData {
+  nomeCompleto: string;
+  email: string;
+  cpf: string;
+  dataNascimento: string;
+  role: string;
+}
+
+function maskCPF(cpf: string) {
+  return cpf.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, "$1.$2.$3-$4");
+}
 
 export default function PerfilPage() {
   const { user } = useAuth();
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [meData, setMeData] = useState<MeData | null>(null);
 
   const [senhaAtual, setSenhaAtual] = useState("");
   const [novaSenha, setNovaSenha] = useState("");
@@ -18,6 +31,12 @@ export default function PerfilPage() {
   const [sucesso, setSucesso] = useState(false);
 
   const role = user?.role?.toLowerCase() as "consultor" | "responsavel" | undefined;
+
+  useEffect(() => {
+    apiFetch("/api/auth/me")
+      .then(setMeData)
+      .catch(() => {});
+  }, []);
 
   async function handleAlterarSenha() {
     setErro(null);
@@ -52,6 +71,14 @@ export default function PerfilPage() {
       setSalvando(false);
     }
   }
+
+  const nome = meData?.nomeCompleto ?? user?.nomeCompleto ?? "—";
+  const email = meData?.email ?? user?.email ?? "—";
+  const cpf = meData?.cpf ? maskCPF(meData.cpf) : "—";
+  const dataNasc = meData?.dataNascimento
+    ? new Date(meData.dataNascimento).toLocaleDateString("pt-BR")
+    : "—";
+  const roleLabel = meData?.role ?? user?.role ?? "—";
 
   return (
     <div className="flex min-h-screen bg-[#f8fafb]">
@@ -89,19 +116,27 @@ export default function PerfilPage() {
             {/* Dados da conta */}
             <div className="mt-6 rounded-2xl border border-[#e5eaf0] bg-white p-6">
               <h2 className="text-[15px] font-bold text-[#2e2e2e]">Dados da conta</h2>
-              <div className="mt-4 flex flex-col gap-4">
+              <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
                 <div>
                   <p className="text-[11px] font-semibold uppercase tracking-widest text-[#9ca3af]">Nome completo</p>
-                  <p className="mt-1 text-[15px] font-medium text-[#2e2e2e]">{user?.nomeCompleto ?? "—"}</p>
+                  <p className="mt-1 text-[14px] font-medium text-[#2e2e2e]">{nome}</p>
                 </div>
                 <div>
                   <p className="text-[11px] font-semibold uppercase tracking-widest text-[#9ca3af]">E-mail</p>
-                  <p className="mt-1 text-[15px] font-medium text-[#2e2e2e]">{user?.email ?? "—"}</p>
+                  <p className="mt-1 text-[14px] font-medium text-[#2e2e2e]">{email}</p>
+                </div>
+                <div>
+                  <p className="text-[11px] font-semibold uppercase tracking-widest text-[#9ca3af]">CPF</p>
+                  <p className="mt-1 text-[14px] font-medium text-[#2e2e2e]">{cpf}</p>
+                </div>
+                <div>
+                  <p className="text-[11px] font-semibold uppercase tracking-widest text-[#9ca3af]">Data de nascimento</p>
+                  <p className="mt-1 text-[14px] font-medium text-[#2e2e2e]">{dataNasc}</p>
                 </div>
                 <div>
                   <p className="text-[11px] font-semibold uppercase tracking-widest text-[#9ca3af]">Perfil de acesso</p>
                   <span className="mt-1 inline-block rounded-full bg-[#0f62ac]/10 px-3 py-1 text-[13px] font-semibold text-[#0f62ac]">
-                    {user?.role ?? "—"}
+                    {roleLabel}
                   </span>
                 </div>
               </div>
@@ -116,9 +151,7 @@ export default function PerfilPage() {
 
               <div className="mt-5 flex flex-col gap-3">
                 <div>
-                  <label className="mb-1.5 block text-[12px] font-semibold text-[#6b7280]">
-                    Senha atual
-                  </label>
+                  <label className="mb-1.5 block text-[12px] font-semibold text-[#6b7280]">Senha atual</label>
                   <input
                     type="password"
                     value={senhaAtual}
@@ -127,9 +160,7 @@ export default function PerfilPage() {
                   />
                 </div>
                 <div>
-                  <label className="mb-1.5 block text-[12px] font-semibold text-[#6b7280]">
-                    Nova senha
-                  </label>
+                  <label className="mb-1.5 block text-[12px] font-semibold text-[#6b7280]">Nova senha</label>
                   <input
                     type="password"
                     value={novaSenha}
@@ -138,9 +169,7 @@ export default function PerfilPage() {
                   />
                 </div>
                 <div>
-                  <label className="mb-1.5 block text-[12px] font-semibold text-[#6b7280]">
-                    Confirmar nova senha
-                  </label>
+                  <label className="mb-1.5 block text-[12px] font-semibold text-[#6b7280]">Confirmar nova senha</label>
                   <input
                     type="password"
                     value={confirmarSenha}
@@ -150,9 +179,7 @@ export default function PerfilPage() {
                   />
                 </div>
 
-                {erro && (
-                  <p className="text-[13px] font-medium text-[#f25050]">{erro}</p>
-                )}
+                {erro && <p className="text-[13px] font-medium text-[#f25050]">{erro}</p>}
                 {sucesso && (
                   <div className="flex items-center gap-2 rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-2">
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#059669" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
