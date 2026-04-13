@@ -6,13 +6,8 @@ import { useAuth } from "@/context/AuthContext";
 import { Sidebar, MobileSidebar, TopBar } from "@/app/projeto/components";
 import { apiFetch } from "@/lib/api";
 import {
-  Radar,
-  RadarChart,
-  PolarGrid,
-  PolarAngleAxis,
-  PolarRadiusAxis,
-  ResponsiveContainer,
-  Tooltip,
+  Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis,
+  ResponsiveContainer, Tooltip,
 } from "recharts";
 
 interface ItemSecao {
@@ -84,18 +79,6 @@ const categoriaConfig = {
   Pendente: { label: "Pendente", bg: "bg-[#2d3748]", text: "text-white", border: "border-[#2d3748]", dot: "bg-white", desc: "Aguardando processamento", light: "bg-gray-50 text-gray-600 border-gray-200" },
 };
 
-function RadarTooltip({ active, payload }: any) {
-  if (!active || !payload?.length) return null;
-  const data = payload[0]?.payload;
-  if (!data) return null;
-  return (
-    <div className="rounded-lg border border-[#e2e8f0] bg-white p-3 shadow-lg text-[13px] max-w-[250px]">
-      <p className="font-bold text-[#1a365d] mb-1">{data.label}</p>
-      <p className="text-[#718096] text-[11px] leading-snug">{data.descricao}</p>
-      <p className="mt-1.5 font-semibold text-[#2b6cb0]">Pontuação: {data.pontuacao.toFixed(1)}</p>
-    </div>
-  );
-}
 
 function ClassificacaoModal({ onClose }: { onClose: () => void }) {
   return (
@@ -192,8 +175,7 @@ export default function RelatorioPage() {
   }, [id]);
 
   const cat = relatorio ? categoriaConfig[relatorio.categoria] : null;
-
-  // No longer needed — radar charts render per-section inline
+  const [tipoGrafico, setTipoGrafico] = useState<"empilhado" | "radar">("empilhado");
 
   const totalItens = relatorio?.secoes.reduce((sum, s) => sum + s.totalItens, 0) ?? 0;
   const totalNaoConformes = relatorio?.secoes.reduce((sum, s) => sum + s.itensNaoConformes, 0) ?? 0;
@@ -345,91 +327,268 @@ export default function RelatorioPage() {
                 </div>
               </div>
 
-              {/* ── Radar charts per section (PDF style) ── */}
-              {relatorio.secoes.map((s) => {
-                const itens = s.itens ?? [];
-                const labels = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-                const maxPontuacao = Math.max(...itens.map((i) => i.pontuacao), ...itens.map(() => 35.7));
-                const radarData = itens.map((item, idx) => ({
-                  label: labels[idx] ?? `${idx + 1}`,
-                  pontuacao: item.pontuacao,
-                  descricao: item.descricao,
-                  fullMark: maxPontuacao > 0 ? maxPontuacao : 100,
-                }));
+              {/* ── Toggle tipo de gráfico ── */}
+              <div className="no-print flex items-center justify-end">
+                <div className="flex overflow-hidden rounded-full border border-[#e2e8f0] bg-white text-[12px] font-semibold">
+                  {(["empilhado", "radar"] as const).map((tipo) => (
+                    <button
+                      key={tipo}
+                      onClick={() => setTipoGrafico(tipo)}
+                      className={`px-4 py-1.5 transition-colors ${
+                        tipoGrafico === tipo
+                          ? "bg-[#0f62ac] text-white"
+                          : "text-[#718096] hover:text-[#2e2e2e]"
+                      }`}
+                    >
+                      {tipo === "empilhado" ? "Barras" : "Radar"}
+                    </button>
+                  ))}
+                </div>
+              </div>
 
-                return (
-                  <div key={s.secao} className="overflow-hidden rounded-2xl bg-white">
-                    <div className="px-6 pt-6">
-                      <SectionTitle>{formatSecaoNome(s.secaoNome)}</SectionTitle>
-                    </div>
+              {/* ── Seções ── ordenadas por gravidade: penalidade > não conforme > conforme */}
+              {[...relatorio.secoes]
+                .sort((a, b) => {
+                  if (b.pontuacaoSecao !== a.pontuacaoSecao) return b.pontuacaoSecao - a.pontuacaoSecao;
+                  if (b.itensNaoConformes !== a.itensNaoConformes) return b.itensNaoConformes - a.itensNaoConformes;
+                  return 0;
+                })
+                .map((s) => {
+                  const naoConformes = (s.itens ?? []).filter((i) => i.naoConforme);
+                  // itens is always populated from ScoringService, but NaoConforme flags only exist
+                  // when RespostaBruta was saved. Detect by comparing counts.
+                  const hasRealItemData = s.itensNaoConformes === 0 || naoConformes.length > 0;
+                  const conformeCount = s.totalItens - s.itensNaoConformes;
+                  const hasPenalidade = s.pontuacaoSecao > 0;
 
-                    {/* Radar chart */}
-                    {radarData.length >= 3 ? (
-                      <div className="flex justify-center px-6 py-4">
-                        <div className="h-[300px] w-[340px]">
-                          <ResponsiveContainer width="100%" height="100%">
-                            <RadarChart data={radarData} cx="50%" cy="50%" outerRadius="75%">
-                              <PolarGrid stroke="#cbd5e0" />
-                              <PolarAngleAxis
-                                dataKey="label"
-                                tick={{ fontSize: 13, fill: "#1a365d", fontWeight: 600 }}
-                              />
-                              <PolarRadiusAxis
-                                tick={{ fontSize: 10, fill: "#a0aec0" }}
-                                axisLine={false}
-                              />
-                              <Radar
-                                dataKey="pontuacao"
-                                stroke="#2b6cb0"
-                                fill="#2b6cb0"
-                                fillOpacity={0.15}
-                                strokeWidth={2}
-                              />
-                              <Tooltip content={<RadarTooltip />} />
-                            </RadarChart>
-                          </ResponsiveContainer>
+                  // Emphasis: high = has penalty, medium = non-conformant without penalty, low = all ok
+                  const emphasis = hasPenalidade ? "high" : s.itensNaoConformes > 0 ? "medium" : "low";
+
+                  return (
+                    <div
+                      key={s.secao}
+                      className={`overflow-hidden rounded-2xl bg-white ${
+                        emphasis === "high"
+                          ? "ring-2 ring-red-200"
+                          : emphasis === "medium"
+                          ? "ring-1 ring-amber-200"
+                          : ""
+                      }`}
+                    >
+                      {/* Header */}
+                      <div
+                        className={`flex items-start justify-between gap-4 px-6 py-4 ${
+                          emphasis === "high"
+                            ? "border-b border-red-100 bg-red-50/40"
+                            : emphasis === "medium"
+                            ? "border-b border-amber-100 bg-amber-50/30"
+                            : "border-b border-[#e2e8f0]"
+                        }`}
+                      >
+                        <h3 className="font-[family-name:var(--font-heading)] text-[16px] font-bold text-[#1a365d]">
+                          {formatSecaoNome(s.secaoNome)}
+                        </h3>
+                        <div className="flex shrink-0 flex-col items-end gap-1">
+                          <span
+                            className={`rounded-full px-2.5 py-0.5 text-[11px] font-semibold ${
+                              s.itensNaoConformes === 0
+                                ? "bg-emerald-50 text-emerald-700"
+                                : hasPenalidade
+                                ? "bg-red-50 text-red-600"
+                                : "bg-amber-50 text-amber-700"
+                            }`}
+                          >
+                            {s.itensNaoConformes === 0
+                              ? "Conforme"
+                              : `${s.itensNaoConformes} não conforme(s)`}
+                          </span>
+                          {hasPenalidade && (
+                            <span className="text-[11px] font-bold text-red-500">
+                              +{s.pontuacaoSecao.toFixed(1)} pts penalidade
+                            </span>
+                          )}
                         </div>
                       </div>
-                    ) : (
-                      /* Fallback: summary bar when no sub-items or < 3 items */
-                      <div className="px-6 py-5">
-                        <div className="flex items-center justify-between text-[13px] text-[#718096]">
-                          <span>Conformes: <span className="font-semibold text-[#2b6cb0]">{s.totalItens - s.itensNaoConformes}</span></span>
-                          <span>Não conformes: <span className="font-semibold text-[#e53e3e]">{s.itensNaoConformes}</span></span>
-                          <span>Pontuação: <span className="font-semibold text-[#1a365d]">{s.pontuacaoSecao.toFixed(1)}</span></span>
-                        </div>
-                        <div className="mt-3 h-[8px] overflow-hidden rounded-full bg-[#e2e8f0]">
-                          <div
-                            className="h-full rounded-full bg-[#2b6cb0] transition-all"
-                            style={{ width: `${s.totalItens > 0 ? ((s.totalItens - s.itensNaoConformes) / s.totalItens * 100) : 0}%` }}
-                          />
-                        </div>
-                      </div>
-                    )}
 
-                    {/* Legend (PDF style: A - description = value) */}
-                    {itens.length > 0 && (
-                    <div className="border-t border-[#e2e8f0] px-6 py-4">
-                      <h3 className="font-[family-name:var(--font-heading)] text-[15px] font-bold text-[#1a365d]">
-                        Legenda
-                      </h3>
-                      <div className="mt-1.5 h-[3px] w-[40px] rounded-full bg-[#1a365d]" />
-                      <div className="mt-3 space-y-2">
-                        {itens.map((item, idx) => (
-                          <p key={item.ref} className="text-[13px] leading-relaxed text-[#4a5568]">
-                            <span className="font-bold text-[#1a365d]">{labels[idx]}</span>
-                            {" - "}
-                            {item.descricao}
-                            {" = "}
-                            <span className="font-bold text-[#1a365d]">{item.pontuacao.toFixed(1)}</span>
+                      {/* Gráfico — empilhado ou radar */}
+                      {s.totalItens > 0 && tipoGrafico === "empilhado" && (
+                        <div className="px-6 py-4">
+                          <div className="flex h-5 overflow-hidden rounded-full bg-[#e2e8f0]">
+                            <div
+                              className="h-full bg-emerald-500 transition-all"
+                              style={{ width: `${(conformeCount / s.totalItens) * 100}%` }}
+                            />
+                            {s.itensNaoConformes > 0 && (
+                              <div
+                                className={`h-full transition-all ${
+                                  hasPenalidade ? "bg-red-500" : "bg-amber-400"
+                                }`}
+                                style={{ width: `${(s.itensNaoConformes / s.totalItens) * 100}%` }}
+                              />
+                            )}
+                          </div>
+                          <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-[12px] text-[#718096]">
+                            <span className="flex items-center gap-1.5">
+                              <span className="size-2 rounded-full bg-emerald-500" />
+                              {conformeCount} conforme(s)
+                            </span>
+                            {s.itensNaoConformes > 0 && (
+                              <span className="flex items-center gap-1.5">
+                                <span className={`size-2 rounded-full ${hasPenalidade ? "bg-red-500" : "bg-amber-400"}`} />
+                                {s.itensNaoConformes} não conforme(s)
+                              </span>
+                            )}
+                            <span className="ml-auto font-semibold text-[#1a365d]">
+                              {s.percentualConformidade.toFixed(0)}% de conformidade
+                            </span>
+                          </div>
+                        </div>
+                      )}
+
+                      {s.totalItens > 0 && tipoGrafico === "radar" && (() => {
+                        const itens = s.itens ?? [];
+                        const labels = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+                        const radarData = itens.map((item, idx) => ({
+                          label: labels[idx] ?? `${idx + 1}`,
+                          pontuacao: item.pontuacao,
+                          descricao: item.descricao,
+                          fullMark: Math.max(...itens.map((i) => i.pontuacao), 35.7),
+                        }));
+                        return radarData.length >= 3 ? (
+                          <div className="flex flex-col items-center px-6 py-4">
+                            <div className="h-[260px] w-full max-w-[320px]">
+                              <ResponsiveContainer width="100%" height="100%">
+                                <RadarChart data={radarData} cx="50%" cy="50%" outerRadius="70%">
+                                  <PolarGrid stroke="#cbd5e0" />
+                                  <PolarAngleAxis dataKey="label" tick={{ fontSize: 12, fill: "#1a365d", fontWeight: 600 }} />
+                                  <PolarRadiusAxis tick={{ fontSize: 9, fill: "#a0aec0" }} axisLine={false} />
+                                  <Radar dataKey="pontuacao" stroke="#2b6cb0" fill="#2b6cb0" fillOpacity={0.15} strokeWidth={2} />
+                                  <Tooltip content={({ active, payload }) => {
+                                    if (!active || !payload?.length) return null;
+                                    const d = payload[0]?.payload;
+                                    return (
+                                      <div className="rounded-lg border border-[#e2e8f0] bg-white p-2.5 shadow-lg text-[12px] max-w-[220px]">
+                                        <p className="font-bold text-[#1a365d]">{d.label}</p>
+                                        <p className="text-[#718096] text-[11px] leading-snug">{d.descricao}</p>
+                                        <p className="mt-1 font-semibold text-[#2b6cb0]">Pontuação: {d.pontuacao.toFixed(1)}</p>
+                                      </div>
+                                    );
+                                  }} />
+                                </RadarChart>
+                              </ResponsiveContainer>
+                            </div>
+                            {/* Legenda do radar */}
+                            <div className="mt-2 w-full space-y-1">
+                              {itens.map((item, idx) => (
+                                <p key={item.ref} className="text-[12px] leading-relaxed text-[#4a5568]">
+                                  <span className="font-bold text-[#1a365d]">{labels[idx]}</span>
+                                  {" — "}{item.descricao}
+                                  {" = "}
+                                  <span className={`font-bold ${item.pontuacao > 0 ? "text-red-500" : "text-emerald-600"}`}>
+                                    {item.pontuacao.toFixed(1)}
+                                  </span>
+                                </p>
+                              ))}
+                            </div>
+                          </div>
+                        ) : null;
+                      })()}
+
+                      {/* Não avaliado */}
+                      {s.totalItens === 0 && (
+                        <div className="px-6 py-4 text-[13px] text-[#a0aec0]">Não avaliado</div>
+                      )}
+
+                      {/* Itens não conformes — só mostra se tiver dados reais */}
+                      {s.itensNaoConformes > 0 && (
+                        <div className="border-t border-[#e2e8f0] px-6 py-4">
+                          {hasRealItemData ? (
+                            <>
+                              <h4
+                                className={`mb-3 text-[13px] font-semibold ${
+                                  hasPenalidade ? "text-red-600" : "text-amber-600"
+                                }`}
+                              >
+                                {hasPenalidade
+                                  ? "Itens não conformes — com penalidade na pontuação"
+                                  : "Itens não conformes"}
+                              </h4>
+                              <div className="space-y-2">
+                                {naoConformes.map((item) => (
+                                  <div
+                                    key={item.ref}
+                                    className={`flex gap-3 rounded-xl border px-4 py-3 ${
+                                      item.pontuacao > 0
+                                        ? "border-red-100 bg-red-50"
+                                        : "border-amber-100 bg-amber-50"
+                                    }`}
+                                  >
+                                    <svg
+                                      className={`mt-0.5 shrink-0 ${
+                                        item.pontuacao > 0 ? "text-red-500" : "text-amber-500"
+                                      }`}
+                                      width="15"
+                                      height="15"
+                                      viewBox="0 0 24 24"
+                                      fill="none"
+                                      stroke="currentColor"
+                                      strokeWidth="2.5"
+                                      strokeLinecap="round"
+                                      strokeLinejoin="round"
+                                    >
+                                      <circle cx="12" cy="12" r="10" />
+                                      <line x1="15" y1="9" x2="9" y2="15" />
+                                      <line x1="9" y1="9" x2="15" y2="15" />
+                                    </svg>
+                                    <div className="flex-1">
+                                      <span className="text-[11px] font-bold text-[#1a365d]">
+                                        {item.ref}
+                                      </span>
+                                      <p className="text-[13px] leading-relaxed text-[#4a5568]">
+                                        {item.descricao}
+                                      </p>
+                                      {item.pontuacao > 0 && (
+                                        <span className="mt-1 text-[11px] font-semibold text-red-500">
+                                          +{item.pontuacao.toFixed(1)} pts
+                                        </span>
+                                      )}
+                                    </div>
+                                  </div>
+                                ))}
+                              </div>
+                            </>
+                          ) : (
+                            <p className="text-[13px] text-[#718096]">
+                              {s.itensNaoConformes} item(ns) não conforme(s) — detalhes dos itens
+                              específicos disponíveis a partir de novas avaliações.
+                            </p>
+                          )}
+                        </div>
+                      )}
+
+                      {/* Todos conformes */}
+                      {s.itensNaoConformes === 0 && s.totalItens > 0 && (
+                        <div className="border-t border-[#e2e8f0] px-6 py-3">
+                          <p className="flex items-center gap-2 text-[13px] text-emerald-600">
+                            <svg
+                              width="14"
+                              height="14"
+                              viewBox="0 0 24 24"
+                              fill="none"
+                              stroke="currentColor"
+                              strokeWidth="2.5"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                            >
+                              <polyline points="20 6 9 17 4 12" />
+                            </svg>
+                            Todos os itens estão em conformidade.
                           </p>
-                        ))}
-                      </div>
+                        </div>
+                      )}
                     </div>
-                    )}
-                  </div>
-                );
-              })}
+                  );
+                })}
 
               {/* ── Categorização do serviço (PDF style) ── */}
               <div className="overflow-hidden rounded-2xl bg-white">
@@ -438,10 +597,11 @@ export default function RelatorioPage() {
                 </div>
                 <div className="px-6 pb-6">
                   <p className="text-[13px] leading-relaxed text-[#4a5568]">
-                    {cat.desc === "Boas condições sanitárias" && "O estabelecimento apresenta baixo nível de não conformidades sanitárias, com pontuação inferior a 13,3 pontos. Indica que as boas práticas estão sendo seguidas adequadamente."}
-                    {cat.desc === "Condições regulares — requer atenção" && "O estabelecimento apresenta nível intermediário de não conformidades, com pontuação entre 13,3 e 502,7 pontos. Requer atenção e implementação de melhorias para evitar riscos sanitários."}
-                    {cat.desc === "Condições inadequadas — ação imediata" && "O estabelecimento apresenta alto nível de não conformidades, com pontuação igual ou superior a 502,7 pontos. Exige ação corretiva imediata para garantir a segurança alimentar."}
-                    {cat.desc === "Aguardando processamento" && "O estabelecimento não cumpriu os critérios eliminatórios ou atingiu pontuação igual ou superior a 1152,4 pontos. A vigilância irá adotar medidas necessárias para que o serviço não continue operando nessas condições."}
+                    {relatorio.categoria === "A" && "O estabelecimento apresenta baixo nível de não conformidades sanitárias, com pontuação inferior a 13,3 pontos. Indica que as boas práticas estão sendo seguidas adequadamente."}
+                    {relatorio.categoria === "B" && "O estabelecimento apresenta nível intermediário de não conformidades, com pontuação entre 13,3 e 502,7 pontos. Requer atenção e implementação de melhorias para evitar riscos sanitários."}
+                    {relatorio.categoria === "C" && "O estabelecimento apresenta alto nível de não conformidades, com pontuação igual ou superior a 502,7 pontos. Exige ação corretiva imediata para garantir a segurança alimentar."}
+                    {relatorio.categoria === "Pendente" && !relatorio.cumpriuEliminatorios && "O estabelecimento não cumpriu os critérios eliminatórios relacionados ao abastecimento de água. Independentemente da pontuação geral, essa condição exige ação imediata da vigilância sanitária."}
+                    {relatorio.categoria === "Pendente" && relatorio.cumpriuEliminatorios && "O estabelecimento atingiu pontuação igual ou superior a 1.152,4 pontos, indicando nível crítico de não conformidades. A vigilância sanitária adotará as medidas necessárias para garantir a segurança do serviço."}
                   </p>
                   <div className="mt-4 grid grid-cols-2 gap-2 sm:grid-cols-4">
                     {[
