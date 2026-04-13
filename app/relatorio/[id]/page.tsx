@@ -40,6 +40,37 @@ interface Relatorio {
   secoes: RelatorioSecao[];
 }
 
+/* Map raw API section names to proper Portuguese */
+const secaoNomeMap: Record<string, string> = {
+  AbastecimentoAgua: "Abastecimento de água",
+  abastecimentoAgua: "Abastecimento de água",
+  PreparacaoAlimentos: "Preparação de alimentos",
+  preparacaoAlimentos: "Preparação de alimentos",
+  HigienizacaoInstalacoes: "Higienização de instalações, equipamentos, móveis e utensílios",
+  higienizacaoInstalacoes: "Higienização de instalações, equipamentos, móveis e utensílios",
+  ControleVetoresPragas: "Controle integrado de vetores e pragas urbanas",
+  controleVetoresPragas: "Controle integrado de vetores e pragas urbanas",
+  ManipuladorAlimentos: "Manipuladores de alimentos",
+  manipuladorAlimentos: "Manipuladores de alimentos",
+  MateriaPrimaIngredientes: "Matéria-prima, ingredientes e embalagens",
+  materiaPrimaIngredientes: "Matéria-prima, ingredientes e embalagens",
+  Documentacao: "Documentação e registro",
+  documentacao: "Documentação e registro",
+  ResponsabilidadeTecnica: "Responsabilidade técnica",
+  responsabilidadeTecnica: "Responsabilidade técnica",
+  Edificacoes: "Edificações, instalações, equipamentos, móveis e utensílios",
+  edificacoes: "Edificações, instalações, equipamentos, móveis e utensílios",
+};
+
+function formatSecaoNome(nome: string): string {
+  if (secaoNomeMap[nome]) return secaoNomeMap[nome];
+  // Fallback: split camelCase/PascalCase into words
+  return nome
+    .replace(/([a-z])([A-Z])/g, "$1 $2")
+    .replace(/([A-Z]+)([A-Z][a-z])/g, "$1 $2")
+    .replace(/^./, (c) => c.toUpperCase());
+}
+
 const categoriaConfig = {
   A: { label: "Categoria A", bg: "bg-emerald-600", text: "text-white", border: "border-emerald-600", dot: "bg-white", desc: "Boas condições sanitárias", light: "bg-emerald-50 text-emerald-700 border-emerald-200" },
   B: { label: "Categoria B", bg: "bg-amber-500", text: "text-white", border: "border-amber-500", dot: "bg-white", desc: "Condições regulares — requer atenção", light: "bg-amber-50 text-amber-700 border-amber-200" },
@@ -158,7 +189,7 @@ export default function RelatorioPage() {
   const cat = relatorio ? categoriaConfig[relatorio.categoria] : null;
 
   const chartData = relatorio?.secoes.map((s) => ({
-    name: s.secaoNome,
+    name: formatSecaoNome(s.secaoNome),
     conformes: s.totalItens - s.itensNaoConformes,
     naoConformes: s.itensNaoConformes,
   })) ?? [];
@@ -371,7 +402,7 @@ export default function RelatorioPage() {
                       <div key={s.secao} className="px-6 py-4">
                         <div className="flex items-start justify-between gap-4">
                           <div className="min-w-0 flex-1">
-                            <p className="text-[14px] font-bold text-[#1a365d]">{s.secaoNome}</p>
+                            <p className="text-[14px] font-bold text-[#1a365d]">{formatSecaoNome(s.secaoNome)}</p>
                             <div className="mt-2 flex flex-wrap gap-x-5 gap-y-1 text-[12px] text-[#718096]">
                               <span>Total de itens: <span className="font-semibold text-[#2d3748]">{s.totalItens}</span></span>
                               <span>Não conformes: <span className="font-semibold text-[#e53e3e]">{s.itensNaoConformes}</span></span>
