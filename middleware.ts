@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
-const publicRoutes = ["/", "/login", "/sobre", "/cadastro", "/cadastro/consultor", "/cadastro/responsavel"];
+const publicRoutes = ["/", "/login", "/sobre", "/cadastro", "/cadastro/consultor", "/cadastro/responsavel", "/redefinir-senha"];
 
 export function middleware(request: NextRequest) {
   const token = request.cookies.get("token")?.value;

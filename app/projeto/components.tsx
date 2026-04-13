@@ -401,14 +401,14 @@ export function MobileSidebar({
             label="Início"
             active={isHome}
             collapsed={false}
-            onClick={() => { router.push(`/principal/${role}`); onClose(); }}
+            onClick={() => { router.push("/home"); onClose(); }}
           />
           <SidebarItem
             icon={<BranchIcon />}
             label="Avaliações"
             active={isAvaliacoes}
             collapsed={false}
-            onClick={() => { router.push(`/projeto/${role}`); onClose(); }}
+            onClick={() => { router.push("/avaliacoes"); onClose(); }}
           />
           <SidebarItem
             icon={<SettingsIcon />}

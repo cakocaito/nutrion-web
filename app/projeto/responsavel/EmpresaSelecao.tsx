@@ -44,7 +44,7 @@ export default function EmpresaSelecao({
 
       {/* Back button */}
       <button
-        onClick={() => router.push("/principal/responsavel")}
+        onClick={() => router.push("/home")}
         className="absolute left-6 top-6 z-20 flex size-10 items-center justify-center rounded-full text-[#2e2e2e] transition-colors hover:bg-white/50 sm:left-10 sm:top-10 md:left-[120px] md:top-[140px]"
         aria-label="Voltar"
       >
