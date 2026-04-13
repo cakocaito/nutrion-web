@@ -6,16 +6,21 @@ import { useAuth } from "@/context/AuthContext";
 import { Sidebar, MobileSidebar, TopBar } from "@/app/projeto/components";
 import { apiFetch } from "@/lib/api";
 import {
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  Legend,
+  Radar,
+  RadarChart,
+  PolarGrid,
+  PolarAngleAxis,
+  PolarRadiusAxis,
   ResponsiveContainer,
-  Cell,
+  Tooltip,
 } from "recharts";
+
+interface ItemSecao {
+  ref: string;
+  descricao: string;
+  pontuacao: number;
+  naoConforme: boolean;
+}
 
 interface RelatorioSecao {
   secao: string;
@@ -24,6 +29,7 @@ interface RelatorioSecao {
   totalItens: number;
   itensNaoConformes: number;
   percentualConformidade: number;
+  itens: ItemSecao[];
 }
 
 interface Relatorio {
@@ -42,24 +48,24 @@ interface Relatorio {
 
 /* Map raw API section names to proper Portuguese */
 const secaoNomeMap: Record<string, string> = {
+  // Backend enum names (SecaoChecklist)
+  Higienizacao: "Higienização instalações, equipamentos, móveis e utensílios",
+  VetoresPragas: "Controle integrado de vetores e pragas urbanas",
   AbastecimentoAgua: "Abastecimento de água",
-  abastecimentoAgua: "Abastecimento de água",
+  Manipuladores: "Manipuladores de alimentos",
+  RecepcaoMateriasPrimas: "Recepção de matérias-primas e ingredientes",
+  Armazenamento: "Armazenamento",
   PreparacaoAlimentos: "Preparação de alimentos",
+  ExposicaoConsumo: "Exposição ao consumo",
+  // Fallback camelCase variants
+  higienizacao: "Higienização instalações, equipamentos, móveis e utensílios",
+  vetoresPragas: "Controle integrado de vetores e pragas urbanas",
+  abastecimentoAgua: "Abastecimento de água",
+  manipuladores: "Manipuladores de alimentos",
+  recepcaoMateriasPrimas: "Recepção de matérias-primas e ingredientes",
+  armazenamento: "Armazenamento",
   preparacaoAlimentos: "Preparação de alimentos",
-  HigienizacaoInstalacoes: "Higienização de instalações, equipamentos, móveis e utensílios",
-  higienizacaoInstalacoes: "Higienização de instalações, equipamentos, móveis e utensílios",
-  ControleVetoresPragas: "Controle integrado de vetores e pragas urbanas",
-  controleVetoresPragas: "Controle integrado de vetores e pragas urbanas",
-  ManipuladorAlimentos: "Manipuladores de alimentos",
-  manipuladorAlimentos: "Manipuladores de alimentos",
-  MateriaPrimaIngredientes: "Matéria-prima, ingredientes e embalagens",
-  materiaPrimaIngredientes: "Matéria-prima, ingredientes e embalagens",
-  Documentacao: "Documentação e registro",
-  documentacao: "Documentação e registro",
-  ResponsabilidadeTecnica: "Responsabilidade técnica",
-  responsabilidadeTecnica: "Responsabilidade técnica",
-  Edificacoes: "Edificações, instalações, equipamentos, móveis e utensílios",
-  edificacoes: "Edificações, instalações, equipamentos, móveis e utensílios",
+  exposicaoConsumo: "Exposição ao consumo",
 };
 
 function formatSecaoNome(nome: string): string {
@@ -78,16 +84,15 @@ const categoriaConfig = {
   Pendente: { label: "Pendente", bg: "bg-[#2d3748]", text: "text-white", border: "border-[#2d3748]", dot: "bg-white", desc: "Aguardando processamento", light: "bg-gray-50 text-gray-600 border-gray-200" },
 };
 
-function CustomTooltip({ active, payload, label }: any) {
+function RadarTooltip({ active, payload }: any) {
   if (!active || !payload?.length) return null;
-  const conformes = payload.find((p: any) => p.dataKey === "conformes")?.value ?? 0;
-  const naoConformes = payload.find((p: any) => p.dataKey === "naoConformes")?.value ?? 0;
-  const total = conformes + naoConformes;
+  const data = payload[0]?.payload;
+  if (!data) return null;
   return (
-    <div className="rounded-lg border border-[#e2e8f0] bg-white p-3 shadow-lg text-[13px]">
-      <p className="font-bold text-[#1a365d] mb-1.5">{label}</p>
-      <p className="text-[#2b6cb0]">Conformes: {conformes} ({total > 0 ? ((conformes / total) * 100).toFixed(0) : 0}%)</p>
-      <p className="text-[#e53e3e]">Não conformes: {naoConformes} ({total > 0 ? ((naoConformes / total) * 100).toFixed(0) : 0}%)</p>
+    <div className="rounded-lg border border-[#e2e8f0] bg-white p-3 shadow-lg text-[13px] max-w-[250px]">
+      <p className="font-bold text-[#1a365d] mb-1">{data.label}</p>
+      <p className="text-[#718096] text-[11px] leading-snug">{data.descricao}</p>
+      <p className="mt-1.5 font-semibold text-[#2b6cb0]">Pontuação: {data.pontuacao.toFixed(1)}</p>
     </div>
   );
 }
@@ -188,11 +193,7 @@ export default function RelatorioPage() {
 
   const cat = relatorio ? categoriaConfig[relatorio.categoria] : null;
 
-  const chartData = relatorio?.secoes.map((s) => ({
-    name: formatSecaoNome(s.secaoNome),
-    conformes: s.totalItens - s.itensNaoConformes,
-    naoConformes: s.itensNaoConformes,
-  })) ?? [];
+  // No longer needed — radar charts render per-section inline
 
   const totalItens = relatorio?.secoes.reduce((sum, s) => sum + s.totalItens, 0) ?? 0;
   const totalNaoConformes = relatorio?.secoes.reduce((sum, s) => sum + s.itensNaoConformes, 0) ?? 0;
@@ -344,88 +345,78 @@ export default function RelatorioPage() {
                 </div>
               </div>
 
-              {/* ── Gráfico de barras empilhadas ── */}
-              <div className="overflow-hidden rounded-2xl bg-white">
-                <div className="px-6 pt-6">
-                  <SectionTitle>Conformidade por seção</SectionTitle>
-                  <p className="mt-[-8px] text-[12px] text-[#718096]">Itens conformes vs. não conformes por área avaliada</p>
-                </div>
-                <div className="px-6 pb-6">
-                  <div className="mt-5 h-[340px]">
-                    <ResponsiveContainer width="100%" height="100%">
-                      <BarChart
-                        data={chartData}
-                        layout="vertical"
-                        margin={{ top: 0, right: 16, left: 0, bottom: 0 }}
-                        barSize={20}
-                      >
-                        <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="#e2e8f0" />
-                        <XAxis
-                          type="number"
-                          tick={{ fontSize: 11, fill: "#718096" }}
-                          axisLine={false}
-                          tickLine={false}
-                        />
-                        <YAxis
-                          type="category"
-                          dataKey="name"
-                          width={160}
-                          tick={{ fontSize: 12, fill: "#2d3748", fontWeight: 500 }}
-                          axisLine={false}
-                          tickLine={false}
-                        />
-                        <Tooltip content={<CustomTooltip />} cursor={{ fill: "#edf2f7" }} />
-                        <Legend
-                          iconType="circle"
-                          iconSize={8}
-                          wrapperStyle={{ fontSize: 12, paddingTop: 16, color: "#4a5568" }}
-                          formatter={(value: string) => value === "conformes" ? "Conformes" : "Não conformes"}
-                        />
-                        <Bar dataKey="conformes" stackId="a" fill="#2b6cb0" radius={[0, 0, 0, 0]} />
-                        <Bar dataKey="naoConformes" stackId="a" fill="#e53e3e" radius={[0, 4, 4, 0]} />
-                      </BarChart>
-                    </ResponsiveContainer>
-                  </div>
-                </div>
-              </div>
+              {/* ── Radar charts per section (PDF style) ── */}
+              {relatorio.secoes.map((s) => {
+                const itens = s.itens ?? [];
+                const labels = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+                const maxPontuacao = Math.max(...itens.map((i) => i.pontuacao), ...itens.map(() => 35.7));
+                const radarData = itens.map((item, idx) => ({
+                  label: labels[idx] ?? `${idx + 1}`,
+                  pontuacao: item.pontuacao,
+                  descricao: item.descricao,
+                  fullMark: maxPontuacao > 0 ? maxPontuacao : 100,
+                }));
 
-              {/* ── Detalhamento por seção (PDF legend style) ── */}
-              <div className="overflow-hidden rounded-2xl bg-white">
-                <div className="px-6 pt-6">
-                  <SectionTitle>Detalhamento por seção</SectionTitle>
-                </div>
-                <div className="divide-y divide-[#e2e8f0]">
-                  {relatorio.secoes.map((s) => {
-                    const conformes = s.totalItens - s.itensNaoConformes;
-                    const pctConf = s.totalItens > 0 ? ((conformes / s.totalItens) * 100).toFixed(1) : "0";
-                    return (
-                      <div key={s.secao} className="px-6 py-4">
-                        <div className="flex items-start justify-between gap-4">
-                          <div className="min-w-0 flex-1">
-                            <p className="text-[14px] font-bold text-[#1a365d]">{formatSecaoNome(s.secaoNome)}</p>
-                            <div className="mt-2 flex flex-wrap gap-x-5 gap-y-1 text-[12px] text-[#718096]">
-                              <span>Total de itens: <span className="font-semibold text-[#2d3748]">{s.totalItens}</span></span>
-                              <span>Não conformes: <span className="font-semibold text-[#e53e3e]">{s.itensNaoConformes}</span></span>
-                              <span>Conformidade: <span className="font-semibold text-[#2b6cb0]">{pctConf}%</span></span>
-                            </div>
-                          </div>
-                          <div className="shrink-0 text-right">
-                            <p className="text-[11px] font-semibold uppercase tracking-wider text-[#718096]">Pontuação</p>
-                            <p className="mt-0.5 text-[20px] font-bold text-[#1a365d]">{s.pontuacaoSecao.toFixed(1)}</p>
-                          </div>
-                        </div>
-                        {/* Progress bar */}
-                        <div className="mt-3 h-[6px] overflow-hidden rounded-full bg-[#e2e8f0]">
-                          <div
-                            className="h-full rounded-full bg-[#2b6cb0] transition-all"
-                            style={{ width: `${pctConf}%` }}
-                          />
+                return (
+                  <div key={s.secao} className="overflow-hidden rounded-2xl bg-white">
+                    <div className="px-6 pt-6">
+                      <SectionTitle>{formatSecaoNome(s.secaoNome)}</SectionTitle>
+                    </div>
+
+                    {/* Radar chart */}
+                    {radarData.length > 2 ? (
+                      <div className="flex justify-center px-6 py-4">
+                        <div className="h-[300px] w-[340px]">
+                          <ResponsiveContainer width="100%" height="100%">
+                            <RadarChart data={radarData} cx="50%" cy="50%" outerRadius="75%">
+                              <PolarGrid stroke="#cbd5e0" />
+                              <PolarAngleAxis
+                                dataKey="label"
+                                tick={{ fontSize: 13, fill: "#1a365d", fontWeight: 600 }}
+                              />
+                              <PolarRadiusAxis
+                                tick={{ fontSize: 10, fill: "#a0aec0" }}
+                                axisLine={false}
+                              />
+                              <Radar
+                                dataKey="pontuacao"
+                                stroke="#2b6cb0"
+                                fill="#2b6cb0"
+                                fillOpacity={0.15}
+                                strokeWidth={2}
+                              />
+                              <Tooltip content={<RadarTooltip />} />
+                            </RadarChart>
+                          </ResponsiveContainer>
                         </div>
                       </div>
-                    );
-                  })}
-                </div>
-              </div>
+                    ) : (
+                      <div className="px-6 py-4 text-center text-[13px] text-[#718096]">
+                        Seção com poucos itens para gráfico radar
+                      </div>
+                    )}
+
+                    {/* Legend (PDF style: A - description = value) */}
+                    <div className="border-t border-[#e2e8f0] px-6 py-4">
+                      <h3 className="font-[family-name:var(--font-heading)] text-[15px] font-bold text-[#1a365d]">
+                        Legenda
+                      </h3>
+                      <div className="mt-1.5 h-[3px] w-[40px] rounded-full bg-[#1a365d]" />
+                      <div className="mt-3 space-y-2">
+                        {itens.map((item, idx) => (
+                          <p key={item.ref} className="text-[13px] leading-relaxed text-[#4a5568]">
+                            <span className="font-bold text-[#1a365d]">{labels[idx]}</span>
+                            {" - "}
+                            {item.descricao}
+                            {" = "}
+                            <span className="font-bold text-[#1a365d]">{item.pontuacao.toFixed(1)}</span>
+                          </p>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
 
               {/* ── Categorização do serviço (PDF style) ── */}
               <div className="overflow-hidden rounded-2xl bg-white">
