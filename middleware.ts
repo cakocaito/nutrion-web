@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
-const publicRoutes = ["/", "/cadastro", "/cadastro/consultor", "/cadastro/responsavel"];
+const publicRoutes = ["/", "/login", "/sobre", "/cadastro", "/cadastro/consultor", "/cadastro/responsavel"];
 
 export function middleware(request: NextRequest) {
   const token = request.cookies.get("token")?.value;
@@ -10,7 +10,7 @@ export function middleware(request: NextRequest) {
   const isPublic = publicRoutes.includes(pathname);
 
   if (!token && !isPublic) {
-    return NextResponse.redirect(new URL("/", request.url));
+    return NextResponse.redirect(new URL("/login", request.url));
   }
 
   return NextResponse.next();
