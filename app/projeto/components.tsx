@@ -897,7 +897,7 @@ export function ProjectCard({
 
   const statusMap = {
     em_andamento: { label: "Em andamento", color: "bg-[#0f62ac]/10 text-[#0f62ac]" },
-    concluido: { label: "Concluído", color: "bg-emerald-50 text-emerald-600" },
+    concluido: { label: "Concluída", color: "bg-emerald-50 text-emerald-600" },
     pendente: { label: "Pendente", color: "bg-amber-50 text-amber-600" },
   };
 
