@@ -91,7 +91,7 @@ export default function CadastroResponsavel() {
         email: form.email,
         password: form.password,
       });
-      router.push("/");
+      router.push("/login");
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : "Erro ao cadastrar.");
     } finally {

@@ -244,7 +244,7 @@ export function Sidebar({
 
   function handleLogout() {
     logout();
-    router.push("/");
+    router.push("/login");
   }
 
   const isHome = pathname === "/home";
@@ -369,7 +369,7 @@ export function MobileSidebar({
 
   function handleLogout() {
     logout();
-    router.push("/");
+    router.push("/login");
   }
 
   const isHome = pathname === `/principal/${role}`;
@@ -578,7 +578,7 @@ export function TopBar({
   function handleLogout() {
     setDropdownOpen(false);
     logout();
-    router.push("/");
+    router.push("/login");
   }
 
   function handleBellOpen() {
