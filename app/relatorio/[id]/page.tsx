@@ -364,7 +364,7 @@ export default function RelatorioPage() {
                     </div>
 
                     {/* Radar chart */}
-                    {radarData.length > 2 ? (
+                    {radarData.length >= 3 ? (
                       <div className="flex justify-center px-6 py-4">
                         <div className="h-[300px] w-[340px]">
                           <ResponsiveContainer width="100%" height="100%">
@@ -391,12 +391,24 @@ export default function RelatorioPage() {
                         </div>
                       </div>
                     ) : (
-                      <div className="px-6 py-4 text-center text-[13px] text-[#718096]">
-                        Seção com poucos itens para gráfico radar
+                      /* Fallback: summary bar when no sub-items or < 3 items */
+                      <div className="px-6 py-5">
+                        <div className="flex items-center justify-between text-[13px] text-[#718096]">
+                          <span>Conformes: <span className="font-semibold text-[#2b6cb0]">{s.totalItens - s.itensNaoConformes}</span></span>
+                          <span>Não conformes: <span className="font-semibold text-[#e53e3e]">{s.itensNaoConformes}</span></span>
+                          <span>Pontuação: <span className="font-semibold text-[#1a365d]">{s.pontuacaoSecao.toFixed(1)}</span></span>
+                        </div>
+                        <div className="mt-3 h-[8px] overflow-hidden rounded-full bg-[#e2e8f0]">
+                          <div
+                            className="h-full rounded-full bg-[#2b6cb0] transition-all"
+                            style={{ width: `${s.totalItens > 0 ? ((s.totalItens - s.itensNaoConformes) / s.totalItens * 100) : 0}%` }}
+                          />
+                        </div>
                       </div>
                     )}
 
                     {/* Legend (PDF style: A - description = value) */}
+                    {itens.length > 0 && (
                     <div className="border-t border-[#e2e8f0] px-6 py-4">
                       <h3 className="font-[family-name:var(--font-heading)] text-[15px] font-bold text-[#1a365d]">
                         Legenda
@@ -414,6 +426,7 @@ export default function RelatorioPage() {
                         ))}
                       </div>
                     </div>
+                    )}
                   </div>
                 );
               })}
