@@ -41,10 +41,10 @@ interface Relatorio {
 }
 
 const categoriaConfig = {
-  A: { label: "Categoria A", color: "bg-emerald-50 text-emerald-700 border-emerald-200", dot: "bg-emerald-500", desc: "Boas condições sanitárias" },
-  B: { label: "Categoria B", color: "bg-amber-50 text-amber-700 border-amber-200", dot: "bg-amber-500", desc: "Condições regulares — requer atenção" },
-  C: { label: "Categoria C", color: "bg-red-50 text-red-700 border-red-200", dot: "bg-red-500", desc: "Condições inadequadas — ação imediata" },
-  Pendente: { label: "Pendente", color: "bg-gray-50 text-gray-600 border-gray-200", dot: "bg-gray-400", desc: "Aguardando processamento" },
+  A: { label: "Categoria A", bg: "bg-emerald-600", text: "text-white", border: "border-emerald-600", dot: "bg-white", desc: "Boas condições sanitárias", light: "bg-emerald-50 text-emerald-700 border-emerald-200" },
+  B: { label: "Categoria B", bg: "bg-amber-500", text: "text-white", border: "border-amber-500", dot: "bg-white", desc: "Condições regulares — requer atenção", light: "bg-amber-50 text-amber-700 border-amber-200" },
+  C: { label: "Categoria C", bg: "bg-red-600", text: "text-white", border: "border-red-600", dot: "bg-white", desc: "Condições inadequadas — ação imediata", light: "bg-red-50 text-red-700 border-red-200" },
+  Pendente: { label: "Pendente", bg: "bg-[#2d3748]", text: "text-white", border: "border-[#2d3748]", dot: "bg-white", desc: "Aguardando processamento", light: "bg-gray-50 text-gray-600 border-gray-200" },
 };
 
 function CustomTooltip({ active, payload, label }: any) {
@@ -53,10 +53,10 @@ function CustomTooltip({ active, payload, label }: any) {
   const naoConformes = payload.find((p: any) => p.dataKey === "naoConformes")?.value ?? 0;
   const total = conformes + naoConformes;
   return (
-    <div className="rounded-xl border border-[#e5eaf0] bg-white p-3 shadow-lg text-[13px]">
-      <p className="font-semibold text-[#2e2e2e] mb-1">{label}</p>
-      <p className="text-emerald-600">Conformes: {conformes} ({total > 0 ? ((conformes / total) * 100).toFixed(0) : 0}%)</p>
-      <p className="text-red-500">Não conformes: {naoConformes} ({total > 0 ? ((naoConformes / total) * 100).toFixed(0) : 0}%)</p>
+    <div className="rounded-lg border border-[#e2e8f0] bg-white p-3 shadow-lg text-[13px]">
+      <p className="font-bold text-[#1a365d] mb-1.5">{label}</p>
+      <p className="text-[#2b6cb0]">Conformes: {conformes} ({total > 0 ? ((conformes / total) * 100).toFixed(0) : 0}%)</p>
+      <p className="text-[#e53e3e]">Não conformes: {naoConformes} ({total > 0 ? ((naoConformes / total) * 100).toFixed(0) : 0}%)</p>
     </div>
   );
 }
@@ -65,9 +65,9 @@ function ClassificacaoModal({ onClose }: { onClose: () => void }) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4 backdrop-blur-sm">
       <div className="w-full max-w-[500px] overflow-hidden rounded-2xl bg-white shadow-2xl">
-        <div className="flex items-center justify-between border-b border-[#e5eaf0] px-6 py-4">
-          <h2 className="text-[15px] font-bold text-[#2e2e2e]">Sistema de classificação</h2>
-          <button onClick={onClose} className="flex size-7 items-center justify-center rounded-full text-[#9ca3af] hover:bg-gray-100">
+        <div className="flex items-center justify-between bg-[#1a365d] px-6 py-4">
+          <h2 className="text-[15px] font-bold text-white">Sistema de classificação</h2>
+          <button onClick={onClose} className="flex size-7 items-center justify-center rounded-full text-white/70 hover:text-white">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
               <line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" />
             </svg>
@@ -81,6 +81,7 @@ function ClassificacaoModal({ onClose }: { onClose: () => void }) {
               dot: "bg-emerald-500",
               titulo: "Boas condições sanitárias",
               desc: "O estabelecimento apresenta baixo nível de não conformidades. Pontuação inferior a 13,3 pontos. Indica que as boas práticas estão sendo seguidas adequadamente.",
+              range: "≥ 0 e < 13,3",
             },
             {
               label: "Categoria B",
@@ -88,6 +89,7 @@ function ClassificacaoModal({ onClose }: { onClose: () => void }) {
               dot: "bg-amber-500",
               titulo: "Condições regulares",
               desc: "Nível intermediário de não conformidades. Pontuação entre 13,3 e 502,7 pontos. Requer atenção e implementação de melhorias para evitar riscos sanitários.",
+              range: "≥ 13,3 e < 502,7",
             },
             {
               label: "Categoria C",
@@ -95,6 +97,7 @@ function ClassificacaoModal({ onClose }: { onClose: () => void }) {
               dot: "bg-red-500",
               titulo: "Condições inadequadas",
               desc: "Alto nível de não conformidades. Pontuação igual ou superior a 502,7 pontos. Exige ação corretiva imediata para garantir a segurança alimentar.",
+              range: "≥ 502,7 e < 1152,3",
             },
             {
               label: "Pendente",
@@ -102,6 +105,7 @@ function ClassificacaoModal({ onClose }: { onClose: () => void }) {
               dot: "bg-gray-400",
               titulo: "Critério eliminatório ou pontuação crítica",
               desc: "Atribuída quando o estabelecimento não cumpre os critérios eliminatórios (relacionados ao abastecimento de água) ou atinge pontuação igual ou superior a 1152,4 pontos.",
+              range: "≥ 1152,4",
             },
           ].map((c) => (
             <div key={c.label} className={`rounded-xl border p-4 ${c.color}`}>
@@ -115,6 +119,18 @@ function ClassificacaoModal({ onClose }: { onClose: () => void }) {
           ))}
         </div>
       </div>
+    </div>
+  );
+}
+
+/* ── Section title with blue underline (matches PDF style) ── */
+function SectionTitle({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="mb-4">
+      <h2 className="font-[family-name:var(--font-heading)] text-[18px] font-bold text-[#1a365d]">
+        {children}
+      </h2>
+      <div className="mt-1.5 h-[3px] w-[50px] rounded-full bg-[#0f62ac]" />
     </div>
   );
 }
@@ -147,8 +163,12 @@ export default function RelatorioPage() {
     naoConformes: s.itensNaoConformes,
   })) ?? [];
 
+  const totalItens = relatorio?.secoes.reduce((sum, s) => sum + s.totalItens, 0) ?? 0;
+  const totalNaoConformes = relatorio?.secoes.reduce((sum, s) => sum + s.itensNaoConformes, 0) ?? 0;
+  const percentualGeralConformidade = totalItens > 0 ? (((totalItens - totalNaoConformes) / totalItens) * 100).toFixed(1) : "0";
+
   return (
-    <div className="flex min-h-screen bg-[#f8fafb]">
+    <div className="flex min-h-screen bg-[#edf2f7]">
       <div className="no-print hidden lg:block">
         <Sidebar role={role} collapsed={sidebarCollapsed} onToggle={() => setSidebarCollapsed(!sidebarCollapsed)} />
       </div>
@@ -211,112 +231,230 @@ export default function RelatorioPage() {
           {modalClassificacao && <ClassificacaoModal onClose={() => setModalClassificacao(false)} />}
 
           {relatorio && cat && (
-            <div className="max-w-[860px] space-y-4">
-              {/* Header */}
-              <div className="rounded-2xl border border-[#e5eaf0] bg-white p-6">
-                <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-                  <div>
-                    <p className="text-[11px] font-semibold uppercase tracking-widest text-[#0f62ac]">Relatório de Avaliação</p>
-                    <h1 className="mt-1 font-[family-name:var(--font-heading)] text-[20px] font-bold text-[#2e2e2e]">
-                      {relatorio.estabelecimentoNome}
-                    </h1>
-                    <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-[12px] text-[#9ca3af]">
-                      <span>Avaliado em {new Date(relatorio.dataAvaliacao).toLocaleDateString("pt-BR")}</span>
-                      <span>Consultor: {relatorio.consultorNome}</span>
-                      <span>Gerado em {new Date(relatorio.dataGeracao).toLocaleDateString("pt-BR")}</span>
-                    </div>
-                  </div>
-                  <div className="flex shrink-0 items-center gap-2">
-                    <span className={`inline-flex items-center gap-2 rounded-xl border px-4 py-2 text-[13px] font-bold ${cat.color}`}>
-                      <span className={`size-2 rounded-full ${cat.dot}`} />
-                      {cat.label}
-                    </span>
-                    <button
-                      onClick={() => setModalClassificacao(true)}
-                      title="Entender a classificação"
-                      className="flex size-7 items-center justify-center rounded-full border border-[#e5eaf0] bg-white text-[#9ca3af] transition-colors hover:border-[#0f62ac]/30 hover:text-[#0f62ac]"
-                    >
-                      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                        <circle cx="12" cy="12" r="10" />
-                        <path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3" />
-                        <line x1="12" y1="17" x2="12.01" y2="17" />
-                      </svg>
-                    </button>
+            <div className="max-w-[860px] space-y-5">
+
+              {/* ── Cover header (PDF style) ── */}
+              <div className="overflow-hidden rounded-2xl">
+                {/* Blue top bar */}
+                <div className="bg-[#0f62ac] px-6 py-5">
+                  <p className="text-[11px] font-semibold uppercase tracking-widest text-white/60">
+                    Resultado da avaliação do risco sanitário
+                  </p>
+                  <h1 className="mt-1 font-[family-name:var(--font-heading)] text-[22px] font-bold text-white">
+                    {relatorio.estabelecimentoNome}
+                  </h1>
+                  <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-[12px] text-white/70">
+                    <span>Data: {new Date(relatorio.dataAvaliacao).toLocaleDateString("pt-BR")}</span>
+                    <span>Consultor: {relatorio.consultorNome}</span>
                   </div>
                 </div>
-                <p className={`mt-3 text-[13px] font-medium ${cat.color.split(" ")[1]}`}>{cat.desc}</p>
               </div>
 
-              {/* Resumo */}
-              <div className="grid grid-cols-3 gap-3">
-                <div className="rounded-2xl border border-[#e5eaf0] bg-white p-4 text-center">
-                  <p className="text-[11px] font-semibold uppercase tracking-widest text-[#9ca3af]">Pontuação</p>
-                  <p className="mt-1 text-[28px] font-bold text-[#2e2e2e]">{relatorio.pontuacaoTotal.toFixed(1)}</p>
+              {/* ── Análise Geral (PDF "Resumo" style) ── */}
+              <div className="overflow-hidden rounded-2xl bg-white">
+                <div className="border-b border-[#e2e8f0] px-6 py-4">
+                  <SectionTitle>Análise Geral</SectionTitle>
                 </div>
-                <div className={`rounded-2xl border p-4 text-center ${relatorio.cumpriuEliminatorios ? "border-emerald-200 bg-emerald-50" : "border-red-200 bg-red-50"}`}>
-                  <p className="text-[11px] font-semibold uppercase tracking-widest text-[#9ca3af]">Eliminatórios</p>
-                  <p className={`mt-1 text-[15px] font-bold ${relatorio.cumpriuEliminatorios ? "text-emerald-600" : "text-red-600"}`}>
-                    {relatorio.cumpriuEliminatorios ? "Cumpriu" : "Não cumpriu"}
+                <div className="grid grid-cols-1 gap-0 sm:grid-cols-3">
+                  {/* Categoria */}
+                  <div className={`flex flex-col items-center justify-center p-6 ${cat.bg}`}>
+                    <p className={`text-[11px] font-semibold uppercase tracking-widest ${cat.text} opacity-70`}>
+                      Categoria
+                    </p>
+                    <p className={`mt-1 font-[family-name:var(--font-heading)] text-[28px] font-bold ${cat.text}`}>
+                      {relatorio.categoria === "Pendente" ? "Pendente" : relatorio.categoria}
+                    </p>
+                    <p className={`mt-1 text-[12px] font-medium ${cat.text} opacity-80`}>
+                      {cat.desc}
+                    </p>
+                  </div>
+                  {/* Pontuação */}
+                  <div className="flex flex-col items-center justify-center border-x border-[#e2e8f0] p-6">
+                    <p className="text-[11px] font-semibold uppercase tracking-widest text-[#718096]">
+                      Pontuação Total
+                    </p>
+                    <p className="mt-1 font-[family-name:var(--font-heading)] text-[36px] font-bold text-[#1a365d]">
+                      {relatorio.pontuacaoTotal.toFixed(1)}
+                    </p>
+                  </div>
+                  {/* % Conformidade */}
+                  <div className="flex flex-col items-center justify-center p-6">
+                    <p className="text-[11px] font-semibold uppercase tracking-widest text-[#718096]">
+                      % Geral de conformidade
+                    </p>
+                    <p className="mt-1 font-[family-name:var(--font-heading)] text-[36px] font-bold text-[#0f62ac]">
+                      {percentualGeralConformidade}
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* ── Critérios ── */}
+              <div className="grid grid-cols-2 gap-4">
+                <div className={`overflow-hidden rounded-2xl border ${relatorio.cumpriuEliminatorios ? "border-emerald-200" : "border-red-200"}`}>
+                  <div className={`px-4 py-2 ${relatorio.cumpriuEliminatorios ? "bg-emerald-600" : "bg-red-600"}`}>
+                    <p className="text-[11px] font-semibold uppercase tracking-widest text-white">Eliminatórios</p>
+                  </div>
+                  <div className={`px-4 py-3 ${relatorio.cumpriuEliminatorios ? "bg-emerald-50" : "bg-red-50"}`}>
+                    <p className={`text-[15px] font-bold ${relatorio.cumpriuEliminatorios ? "text-emerald-700" : "text-red-700"}`}>
+                      {relatorio.cumpriuEliminatorios ? "Cumpriu" : "Não cumpriu"}
+                    </p>
+                  </div>
+                </div>
+                <div className={`overflow-hidden rounded-2xl border ${relatorio.cumpriuClassificatorios ? "border-emerald-200" : "border-red-200"}`}>
+                  <div className={`px-4 py-2 ${relatorio.cumpriuClassificatorios ? "bg-emerald-600" : "bg-red-600"}`}>
+                    <p className="text-[11px] font-semibold uppercase tracking-widest text-white">Classificatórios</p>
+                  </div>
+                  <div className={`px-4 py-3 ${relatorio.cumpriuClassificatorios ? "bg-emerald-50" : "bg-red-50"}`}>
+                    <p className={`text-[15px] font-bold ${relatorio.cumpriuClassificatorios ? "text-emerald-700" : "text-red-700"}`}>
+                      {relatorio.cumpriuClassificatorios ? "Cumpriu" : "Não cumpriu"}
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* ── Gráfico de barras empilhadas ── */}
+              <div className="overflow-hidden rounded-2xl bg-white">
+                <div className="px-6 pt-6">
+                  <SectionTitle>Conformidade por seção</SectionTitle>
+                  <p className="mt-[-8px] text-[12px] text-[#718096]">Itens conformes vs. não conformes por área avaliada</p>
+                </div>
+                <div className="px-6 pb-6">
+                  <div className="mt-5 h-[340px]">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <BarChart
+                        data={chartData}
+                        layout="vertical"
+                        margin={{ top: 0, right: 16, left: 0, bottom: 0 }}
+                        barSize={20}
+                      >
+                        <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="#e2e8f0" />
+                        <XAxis
+                          type="number"
+                          tick={{ fontSize: 11, fill: "#718096" }}
+                          axisLine={false}
+                          tickLine={false}
+                        />
+                        <YAxis
+                          type="category"
+                          dataKey="name"
+                          width={160}
+                          tick={{ fontSize: 12, fill: "#2d3748", fontWeight: 500 }}
+                          axisLine={false}
+                          tickLine={false}
+                        />
+                        <Tooltip content={<CustomTooltip />} cursor={{ fill: "#edf2f7" }} />
+                        <Legend
+                          iconType="circle"
+                          iconSize={8}
+                          wrapperStyle={{ fontSize: 12, paddingTop: 16, color: "#4a5568" }}
+                          formatter={(value: string) => value === "conformes" ? "Conformes" : "Não conformes"}
+                        />
+                        <Bar dataKey="conformes" stackId="a" fill="#2b6cb0" radius={[0, 0, 0, 0]} />
+                        <Bar dataKey="naoConformes" stackId="a" fill="#e53e3e" radius={[0, 4, 4, 0]} />
+                      </BarChart>
+                    </ResponsiveContainer>
+                  </div>
+                </div>
+              </div>
+
+              {/* ── Detalhamento por seção (PDF legend style) ── */}
+              <div className="overflow-hidden rounded-2xl bg-white">
+                <div className="px-6 pt-6">
+                  <SectionTitle>Detalhamento por seção</SectionTitle>
+                </div>
+                <div className="divide-y divide-[#e2e8f0]">
+                  {relatorio.secoes.map((s) => {
+                    const conformes = s.totalItens - s.itensNaoConformes;
+                    const pctConf = s.totalItens > 0 ? ((conformes / s.totalItens) * 100).toFixed(1) : "0";
+                    return (
+                      <div key={s.secao} className="px-6 py-4">
+                        <div className="flex items-start justify-between gap-4">
+                          <div className="min-w-0 flex-1">
+                            <p className="text-[14px] font-bold text-[#1a365d]">{s.secaoNome}</p>
+                            <div className="mt-2 flex flex-wrap gap-x-5 gap-y-1 text-[12px] text-[#718096]">
+                              <span>Total de itens: <span className="font-semibold text-[#2d3748]">{s.totalItens}</span></span>
+                              <span>Não conformes: <span className="font-semibold text-[#e53e3e]">{s.itensNaoConformes}</span></span>
+                              <span>Conformidade: <span className="font-semibold text-[#2b6cb0]">{pctConf}%</span></span>
+                            </div>
+                          </div>
+                          <div className="shrink-0 text-right">
+                            <p className="text-[11px] font-semibold uppercase tracking-wider text-[#718096]">Pontuação</p>
+                            <p className="mt-0.5 text-[20px] font-bold text-[#1a365d]">{s.pontuacaoSecao.toFixed(1)}</p>
+                          </div>
+                        </div>
+                        {/* Progress bar */}
+                        <div className="mt-3 h-[6px] overflow-hidden rounded-full bg-[#e2e8f0]">
+                          <div
+                            className="h-full rounded-full bg-[#2b6cb0] transition-all"
+                            style={{ width: `${pctConf}%` }}
+                          />
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* ── Categorização do serviço (PDF style) ── */}
+              <div className="overflow-hidden rounded-2xl bg-white">
+                <div className="px-6 pt-6">
+                  <SectionTitle>Categorização do serviço</SectionTitle>
+                </div>
+                <div className="px-6 pb-6">
+                  <p className="text-[13px] leading-relaxed text-[#4a5568]">
+                    {cat.desc === "Boas condições sanitárias" && "O estabelecimento apresenta baixo nível de não conformidades sanitárias, com pontuação inferior a 13,3 pontos. Indica que as boas práticas estão sendo seguidas adequadamente."}
+                    {cat.desc === "Condições regulares — requer atenção" && "O estabelecimento apresenta nível intermediário de não conformidades, com pontuação entre 13,3 e 502,7 pontos. Requer atenção e implementação de melhorias para evitar riscos sanitários."}
+                    {cat.desc === "Condições inadequadas — ação imediata" && "O estabelecimento apresenta alto nível de não conformidades, com pontuação igual ou superior a 502,7 pontos. Exige ação corretiva imediata para garantir a segurança alimentar."}
+                    {cat.desc === "Aguardando processamento" && "O estabelecimento não cumpriu os critérios eliminatórios ou atingiu pontuação igual ou superior a 1152,4 pontos. A vigilância irá adotar medidas necessárias para que o serviço não continue operando nessas condições."}
                   </p>
-                </div>
-                <div className={`rounded-2xl border p-4 text-center ${relatorio.cumpriuClassificatorios ? "border-emerald-200 bg-emerald-50" : "border-red-200 bg-red-50"}`}>
-                  <p className="text-[11px] font-semibold uppercase tracking-widest text-[#9ca3af]">Classificatórios</p>
-                  <p className={`mt-1 text-[15px] font-bold ${relatorio.cumpriuClassificatorios ? "text-emerald-600" : "text-red-600"}`}>
-                    {relatorio.cumpriuClassificatorios ? "Cumpriu" : "Não cumpriu"}
-                  </p>
-                </div>
-              </div>
-
-              {/* Gráfico de barras empilhadas */}
-              <div className="rounded-2xl border border-[#e5eaf0] bg-white p-6">
-                <p className="text-[11px] font-semibold uppercase tracking-widest text-[#0f62ac]">
-                  Conformidade por seção
-                </p>
-                <p className="mt-1 text-[12px] text-[#9ca3af]">Itens conformes vs. não conformes por área avaliada</p>
-                <div className="mt-6 h-[340px]">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <BarChart
-                      data={chartData}
-                      layout="vertical"
-                      margin={{ top: 0, right: 16, left: 0, bottom: 0 }}
-                      barSize={22}
-                    >
-                      <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="#f0f4f8" />
-                      <XAxis
-                        type="number"
-                        tick={{ fontSize: 11, fill: "#9ca3af" }}
-                        axisLine={false}
-                        tickLine={false}
-                      />
-                      <YAxis
-                        type="category"
-                        dataKey="name"
-                        width={160}
-                        tick={{ fontSize: 12, fill: "#4b5563" }}
-                        axisLine={false}
-                        tickLine={false}
-                      />
-                      <Tooltip content={<CustomTooltip />} cursor={{ fill: "#f8fafb" }} />
-                      <Legend
-                        iconType="circle"
-                        iconSize={8}
-                        wrapperStyle={{ fontSize: 12, paddingTop: 16 }}
-                        formatter={(value) => value === "conformes" ? "Conformes" : "Não conformes"}
-                      />
-                      <Bar dataKey="conformes" stackId="a" fill="#10b981" radius={[0, 0, 0, 0]} />
-                      <Bar dataKey="naoConformes" stackId="a" fill="#f87171" radius={[0, 4, 4, 0]} />
-                    </BarChart>
-                  </ResponsiveContainer>
+                  <div className="mt-4 grid grid-cols-2 gap-2 sm:grid-cols-4">
+                    {[
+                      { label: "A", range: "< 13,3", active: relatorio.categoria === "A", color: "bg-emerald-600" },
+                      { label: "B", range: "13,3 – 502,7", active: relatorio.categoria === "B", color: "bg-amber-500" },
+                      { label: "C", range: "502,7 – 1152,3", active: relatorio.categoria === "C", color: "bg-red-600" },
+                      { label: "Pendente", range: "≥ 1152,4", active: relatorio.categoria === "Pendente", color: "bg-[#2d3748]" },
+                    ].map((c) => (
+                      <div
+                        key={c.label}
+                        className={`rounded-xl px-3 py-2.5 text-center transition-all ${
+                          c.active
+                            ? `${c.color} text-white shadow-md`
+                            : "bg-[#edf2f7] text-[#718096]"
+                        }`}
+                      >
+                        <p className={`text-[14px] font-bold ${c.active ? "text-white" : "text-[#2d3748]"}`}>{c.label}</p>
+                        <p className={`text-[11px] ${c.active ? "text-white/80" : "text-[#a0aec0]"}`}>{c.range}</p>
+                      </div>
+                    ))}
+                  </div>
+                  <button
+                    onClick={() => setModalClassificacao(true)}
+                    className="mt-4 text-[12px] font-semibold text-[#0f62ac] hover:underline"
+                  >
+                    Ver detalhes da classificação
+                  </button>
                 </div>
               </div>
 
-              {/* Proposta de intervenção */}
+              {/* ── Proposta de intervenção ── */}
               {relatorio.propostaIntervencao && (
-                <div className="rounded-2xl border border-amber-200 bg-amber-50 p-6">
-                  <p className="text-[11px] font-semibold uppercase tracking-widest text-amber-600">Proposta de intervenção</p>
-                  <p className="mt-2 text-[14px] leading-relaxed text-[#4b5563]">{relatorio.propostaIntervencao}</p>
+                <div className="overflow-hidden rounded-2xl">
+                  <div className="bg-[#dd6b20] px-6 py-3">
+                    <p className="text-[11px] font-semibold uppercase tracking-widest text-white">
+                      Proposta de intervenção
+                    </p>
+                  </div>
+                  <div className="bg-orange-50 px-6 py-5">
+                    <p className="text-[14px] leading-relaxed text-[#4a5568]">{relatorio.propostaIntervencao}</p>
+                  </div>
                 </div>
               )}
+
+              {/* ── Footer ── */}
+              <p className="pb-4 text-center text-[11px] text-[#a0aec0]">
+                Relatório gerado em {new Date(relatorio.dataGeracao).toLocaleDateString("pt-BR")} · NutriSec — Sistema de avaliação de segurança alimentar
+              </p>
             </div>
           )}
         </main>
