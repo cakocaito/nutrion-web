@@ -142,7 +142,10 @@ export default function CadastroResponsavel() {
             <input type="text" placeholder="CPF" value={form.cpf} onChange={(e) => set("cpf", maskCPF(e.target.value))} className={errors.cpf ? inputErrorClass : inputClass} />
             <FieldError msg={errors.cpf} />
 
-            <input type="date" placeholder="Data de nascimento" value={form.dataNascimento} onChange={(e) => set("dataNascimento", e.target.value)} className={errors.dataNascimento ? inputErrorClass : inputClass} />
+            <div className="flex flex-col gap-1">
+              <label className="px-2 text-[13px] font-semibold text-[#2e2e2e]">Data de nascimento</label>
+              <input type="date" value={form.dataNascimento} onChange={(e) => set("dataNascimento", e.target.value)} className={errors.dataNascimento ? inputErrorClass : inputClass} />
+            </div>
             <FieldError msg={errors.dataNascimento} />
 
             <input type="email" placeholder="E-mail" value={form.email} onChange={(e) => set("email", e.target.value)} className={errors.email ? inputErrorClass : inputClass} />
