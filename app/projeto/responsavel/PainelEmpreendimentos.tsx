@@ -157,10 +157,6 @@ function EmpreendimentoCard({
       </div>
       <div className="mt-3 space-y-1">
         <p className="text-[12px] text-[#6b7280]">
-          <span className="font-semibold">CNPJ:</span>{" "}
-          {estabelecimento.cnpj}
-        </p>
-        <p className="text-[12px] text-[#6b7280]">
           <span className="font-semibold">Telefone:</span>{" "}
           {estabelecimento.telefone}
         </p>

@@ -4,10 +4,8 @@ import Image from "next/image";
 import { useState } from "react";
 import { criarEstabelecimento } from "@/lib/empresas";
 import {
-  maskCNPJ,
   maskCEP,
   maskTelefone,
-  validateCNPJ,
   validateCEP,
   validateTelefone,
   validateEmail,
@@ -36,7 +34,6 @@ export default function CadastrarEmpreendimento({
 }) {
   const [form, setForm] = useState({
     nome: "",
-    cnpj: "",
     endereco: "",
     cep: "",
     telefone: "",
@@ -56,9 +53,6 @@ export default function CadastrarEmpreendimento({
 
     const nomeErr = validateRequired(form.nome, "Nome do estabelecimento");
     if (nomeErr) e.nome = nomeErr;
-
-    const cnpjErr = validateCNPJ(form.cnpj);
-    if (cnpjErr) e.cnpj = cnpjErr;
 
     const enderecoErr = validateRequired(form.endereco, "Endereço");
     if (enderecoErr) e.endereco = enderecoErr;
@@ -84,7 +78,6 @@ export default function CadastrarEmpreendimento({
     try {
       await criarEstabelecimento({
         nome: form.nome,
-        cnpj: form.cnpj.replace(/\D/g, ""),
         endereco: form.endereco,
         cep: form.cep.replace(/\D/g, ""),
         telefone: form.telefone.replace(/\D/g, ""),
@@ -146,9 +139,6 @@ export default function CadastrarEmpreendimento({
           <div className="mt-5 flex flex-col gap-4 sm:mt-6 sm:gap-5">
             <input type="text" placeholder="Nome do estabelecimento" value={form.nome} onChange={(e) => set("nome", e.target.value)} className={errors.nome ? inputErrorClass : inputClass} />
             <FieldError msg={errors.nome} />
-
-            <input type="text" placeholder="CNPJ" value={form.cnpj} onChange={(e) => set("cnpj", maskCNPJ(e.target.value))} className={errors.cnpj ? inputErrorClass : inputClass} />
-            <FieldError msg={errors.cnpj} />
 
             <input type="text" placeholder="Endereço" value={form.endereco} onChange={(e) => set("endereco", e.target.value)} className={errors.endereco ? inputErrorClass : inputClass} />
             <FieldError msg={errors.endereco} />

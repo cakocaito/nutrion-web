@@ -9,6 +9,7 @@ import {
   FilterIcon,
 } from "../components";
 import { apiFetch } from "@/lib/api";
+import { buscarEmpresaPorCnpj, listarEstabelecimentosPorEmpresa, Estabelecimento as EstabelecimentoLib } from "@/lib/empresas";
 import { maskCNPJ, validateCNPJ, validateDataAgendada } from "@/lib/validators";
 
 interface Avaliacao {
@@ -20,12 +21,7 @@ interface Avaliacao {
   temRelatorio: boolean;
 }
 
-interface Estabelecimento {
-  id: number;
-  nome: string;
-  cnpj: string;
-  empresaNome: string | null;
-}
+type Estabelecimento = EstabelecimentoLib;
 
 function mapStatus(status: Avaliacao["status"]): "pendente" | "em_andamento" | "concluido" {
   switch (status) {
@@ -43,6 +39,7 @@ function NovaAvaliacaoModal({
   onCriada: () => void;
 }) {
   const [cnpj, setCnpj] = useState("");
+  const [estabelecimentos, setEstabelecimentos] = useState<Estabelecimento[]>([]);
   const [estabelecimento, setEstabelecimento] = useState<Estabelecimento | null>(null);
   const [dataAgendada, setDataAgendada] = useState("");
   const [buscando, setBuscando] = useState(false);
@@ -51,8 +48,10 @@ function NovaAvaliacaoModal({
   const [codigoCriado, setCodigoCriado] = useState<number | null>(null);
   const [copiado, setCopiado] = useState(false);
 
-  async function buscarEstabelecimento() {
+  async function buscarEstabelecimentos() {
     setErro(null);
+    setEstabelecimentos([]);
+    setEstabelecimento(null);
     const cnpjErr = validateCNPJ(cnpj);
     if (cnpjErr) {
       setErro(cnpjErr);
@@ -60,11 +59,16 @@ function NovaAvaliacaoModal({
     }
     setBuscando(true);
     try {
-      const data = await apiFetch(`/api/estabelecimentos/buscar?cnpj=${cnpj.replace(/\D/g, "")}`);
-      setEstabelecimento(data);
+      const empresa = await buscarEmpresaPorCnpj(cnpj.replace(/\D/g, ""));
+      const lista = await listarEstabelecimentosPorEmpresa(empresa.id);
+      if (lista.length === 0) {
+        setErro("Nenhum estabelecimento encontrado para este CNPJ.");
+      } else {
+        setEstabelecimentos(lista);
+        if (lista.length === 1) setEstabelecimento(lista[0]);
+      }
     } catch {
-      setErro("Estabelecimento não encontrado.");
-      setEstabelecimento(null);
+      setErro("Empresa não encontrada.");
     } finally {
       setBuscando(false);
     }
@@ -72,7 +76,7 @@ function NovaAvaliacaoModal({
 
   async function salvar() {
     if (!estabelecimento) {
-      setErro("Busque um estabelecimento pelo CNPJ.");
+      setErro("Selecione um estabelecimento.");
       return;
     }
     const dataErr = validateDataAgendada(dataAgendada);
@@ -153,24 +157,24 @@ function NovaAvaliacaoModal({
           Nova avaliação
         </h2>
         <p className="mt-1 text-[13px] text-[#6b7280]">
-          Busque o estabelecimento pelo CNPJ e defina a data.
+          Busque a empresa pelo CNPJ, selecione o estabelecimento e defina a data.
         </p>
 
         <div className="mt-5 flex flex-col gap-4">
           <div>
             <label className="mb-1.5 block text-[13px] font-semibold text-[#2e2e2e]">
-              CNPJ do estabelecimento
+              CNPJ da empresa
             </label>
             <div className="flex gap-2">
               <input
                 type="text"
                 placeholder="00.000.000/0000-00"
                 value={cnpj}
-                onChange={(e) => setCnpj(maskCNPJ(e.target.value))}
+                onChange={(e) => { setCnpj(maskCNPJ(e.target.value)); setEstabelecimentos([]); setEstabelecimento(null); }}
                 className="h-[40px] flex-1 rounded-lg border border-[#9e9e9e]/30 px-3 text-[14px] text-[#2e2e2e] outline-none focus:border-[#0f62ac]/50"
               />
               <button
-                onClick={buscarEstabelecimento}
+                onClick={buscarEstabelecimentos}
                 disabled={buscando}
                 className="h-[40px] rounded-lg bg-[#0f62ac]/10 px-4 text-[13px] font-semibold text-[#0f62ac] transition-colors hover:bg-[#0f62ac]/20 disabled:opacity-50"
               >
@@ -179,7 +183,31 @@ function NovaAvaliacaoModal({
             </div>
           </div>
 
-          {estabelecimento && (
+          {estabelecimentos.length > 1 && (
+            <div>
+              <label className="mb-1.5 block text-[13px] font-semibold text-[#2e2e2e]">
+                Estabelecimento
+              </label>
+              <div className="flex flex-col gap-2">
+                {estabelecimentos.map((est) => (
+                  <button
+                    key={est.id}
+                    onClick={() => setEstabelecimento(est)}
+                    className={`rounded-lg border px-4 py-2.5 text-left text-[13px] transition-colors ${
+                      estabelecimento?.id === est.id
+                        ? "border-[#0f62ac]/40 bg-[#0f62ac]/5 font-semibold text-[#0f62ac]"
+                        : "border-[#9e9e9e]/30 text-[#2e2e2e] hover:border-[#0f62ac]/30"
+                    }`}
+                  >
+                    {est.nome}
+                    {est.endereco && <span className="ml-2 text-[11px] text-[#6b7280]">{est.endereco}</span>}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {estabelecimentos.length === 1 && estabelecimento && (
             <div className="rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-3">
               <p className="text-[14px] font-semibold text-emerald-700">{estabelecimento.nome}</p>
               {estabelecimento.empresaNome && (

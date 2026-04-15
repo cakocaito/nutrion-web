@@ -12,12 +12,12 @@ export interface Empresa {
 export interface Estabelecimento {
   id: number;
   nome: string;
-  cnpj: string;
   endereco: string;
   cep: string;
   telefone: string;
   email: string;
   ativo: boolean;
+  empresaId: number | null;
   empresaNome: string | null;
   responsavelNome: string | null;
   dataCriacao: string;
@@ -63,7 +63,6 @@ export async function listarEstabelecimentosPorEmpresa(
 
 export async function criarEstabelecimento(data: {
   nome: string;
-  cnpj: string;
   endereco: string;
   cep: string;
   telefone: string;

@@ -541,9 +541,6 @@ export default function RelatorioPage() {
                                       <line x1="9" y1="9" x2="15" y2="15" />
                                     </svg>
                                     <div className="flex-1">
-                                      <span className="text-[11px] font-bold text-[#1a365d]">
-                                        {item.ref}
-                                      </span>
                                       <p className="text-[13px] leading-relaxed text-[#4a5568]">
                                         {item.descricao}
                                       </p>

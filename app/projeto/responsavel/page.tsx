@@ -203,7 +203,6 @@ function EmpreendimentosLista({ empresaId, onNovoEmpreendimento }: { empresaId: 
           </div>
           <p className="mt-1 text-[13px] text-[#6b7280]">{est.endereco}</p>
           <div className="mt-3 space-y-0.5 text-[12px] text-[#6b7280]">
-            <p><span className="font-semibold">CNPJ:</span> {est.cnpj}</p>
             {est.telefone && <p><span className="font-semibold">Tel:</span> {est.telefone}</p>}
           </div>
         </div>
