@@ -14,7 +14,10 @@ export async function apiFetch(path: string, options: RequestInit = {}) {
 
   if (!res.ok) {
     const error = await res.json().catch(() => ({ message: "Erro desconhecido" }));
-    throw new Error(error.message ?? "Erro na requisição");
+    if (Array.isArray(error)) {
+      throw new Error(error.map((e: { description?: string; message?: string }) => e.description ?? e.message).filter(Boolean).join(" ") || "Erro na requisição");
+    }
+    throw new Error(error.message ?? error.title ?? "Erro na requisição");
   }
 
   return res.json();
