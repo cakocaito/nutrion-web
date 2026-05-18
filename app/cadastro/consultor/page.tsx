@@ -20,6 +20,22 @@ const inputClass =
 const inputErrorClass =
   "h-[50px] w-full rounded-full border border-red-400 bg-white px-6 text-[15px] font-medium text-[#2e2e2e] placeholder-[#a3b5bf] outline-none transition-colors focus:border-red-500 sm:h-[55px] sm:text-[17px]";
 
+function Eye() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" /><circle cx="12" cy="12" r="3" />
+    </svg>
+  );
+}
+
+function EyeOff() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94" /><path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19" /><line x1="1" y1="1" x2="23" y2="23" />
+    </svg>
+  );
+}
+
 function FieldError({ msg }: { msg?: string }) {
   if (!msg) return null;
   return <p className="-mt-2 px-6 text-[12px] font-medium text-red-500">{msg}</p>;
@@ -39,6 +55,8 @@ export default function CadastroConsultor() {
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   function set(field: string, value: string) {
     setForm((f) => ({ ...f, [field]: value }));
@@ -151,10 +169,20 @@ export default function CadastroConsultor() {
             <input type="email" placeholder="E-mail" value={form.email} onChange={(e) => set("email", e.target.value)} className={errors.email ? inputErrorClass : inputClass} />
             <FieldError msg={errors.email} />
 
-            <input type="password" placeholder="Senha (mínimo 8 caracteres)" value={form.password} onChange={(e) => set("password", e.target.value)} className={errors.password ? inputErrorClass : inputClass} />
+            <div className="relative">
+              <input type={showPassword ? "text" : "password"} placeholder="Senha (mínimo 8 caracteres)" value={form.password} onChange={(e) => set("password", e.target.value)} className={errors.password ? inputErrorClass : inputClass} />
+              <button type="button" onClick={() => setShowPassword(v => !v)} className="absolute right-4 top-1/2 -translate-y-1/2 text-[#a3b5bf] hover:text-[#2e2e2e]" tabIndex={-1}>
+                {showPassword ? <EyeOff /> : <Eye />}
+              </button>
+            </div>
             <FieldError msg={errors.password} />
 
-            <input type="password" placeholder="Confirmar senha" value={form.confirmPassword} onChange={(e) => set("confirmPassword", e.target.value)} className={errors.confirmPassword ? inputErrorClass : inputClass} />
+            <div className="relative">
+              <input type={showConfirmPassword ? "text" : "password"} placeholder="Confirmar senha" value={form.confirmPassword} onChange={(e) => set("confirmPassword", e.target.value)} className={errors.confirmPassword ? inputErrorClass : inputClass} />
+              <button type="button" onClick={() => setShowConfirmPassword(v => !v)} className="absolute right-4 top-1/2 -translate-y-1/2 text-[#a3b5bf] hover:text-[#2e2e2e]" tabIndex={-1}>
+                {showConfirmPassword ? <EyeOff /> : <Eye />}
+              </button>
+            </div>
             <FieldError msg={errors.confirmPassword} />
 
             {error && <p className="px-2 text-[13px] font-medium text-red-500">{error}</p>}
