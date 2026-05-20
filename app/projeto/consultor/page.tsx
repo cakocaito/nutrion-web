@@ -52,10 +52,6 @@ function NovaAvaliacaoModal({
     setErro(null);
     setEstabelecimentos([]);
     setEstabelecimento(null);
-    if (!nome.trim()) {
-      setErro("Digite o nome do estabelecimento.");
-      return;
-    }
     setBuscando(true);
     try {
       const lista = await buscarEstabelecimentosPorNome(nome.trim());
@@ -245,7 +241,7 @@ function NovaAvaliacaoModal({
           </button>
           <button
             onClick={salvar}
-            disabled={salvando || !nome.trim() || !dataAgendada}
+            disabled={salvando || (!estabelecimento && !nome.trim()) || !dataAgendada}
             className="h-[40px] flex-1 rounded-full bg-[#0f62ac] text-[13px] font-semibold text-white transition-colors hover:bg-[#0f62ac]/90 disabled:opacity-50"
           >
             {salvando ? "Criando..." : "Criar avaliação"}

@@ -136,7 +136,8 @@ export function validateRequired(value: string, fieldName: string): string | nul
 
 export function validateDataAgendada(data: string): string | null {
   if (!data) return "Data é obrigatória.";
-  const date = new Date(data);
+  const [year, month, day] = data.split("-").map(Number);
+  const date = new Date(year, month - 1, day);
   const today = new Date();
   today.setHours(0, 0, 0, 0);
   if (date < today) return "A data não pode ser no passado.";
