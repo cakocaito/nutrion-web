@@ -61,6 +61,12 @@ export async function listarEstabelecimentosPorEmpresa(
   return apiFetch(`/api/estabelecimentos?empresaId=${empresaId}`);
 }
 
+export async function buscarEstabelecimentosPorNome(
+  nome: string
+): Promise<Estabelecimento[]> {
+  return apiFetch(`/api/estabelecimentos?nome=${encodeURIComponent(nome)}`);
+}
+
 export async function criarEstabelecimento(data: {
   nome: string;
   endereco: string;

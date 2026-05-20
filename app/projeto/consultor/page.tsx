@@ -9,8 +9,8 @@ import {
   FilterIcon,
 } from "../components";
 import { apiFetch } from "@/lib/api";
-import { buscarEmpresaPorCnpj, listarEstabelecimentosPorEmpresa, Estabelecimento as EstabelecimentoLib } from "@/lib/empresas";
-import { maskCNPJ, validateCNPJ, validateDataAgendada } from "@/lib/validators";
+import { buscarEstabelecimentosPorNome, Estabelecimento as EstabelecimentoLib } from "@/lib/empresas";
+import { validateDataAgendada } from "@/lib/validators";
 
 interface Avaliacao {
   id: number;
@@ -38,7 +38,7 @@ function NovaAvaliacaoModal({
   onClose: () => void;
   onCriada: () => void;
 }) {
-  const [cnpj, setCnpj] = useState("");
+  const [nome, setNome] = useState("");
   const [estabelecimentos, setEstabelecimentos] = useState<Estabelecimento[]>([]);
   const [estabelecimento, setEstabelecimento] = useState<Estabelecimento | null>(null);
   const [dataAgendada, setDataAgendada] = useState("");
@@ -52,23 +52,21 @@ function NovaAvaliacaoModal({
     setErro(null);
     setEstabelecimentos([]);
     setEstabelecimento(null);
-    const cnpjErr = validateCNPJ(cnpj);
-    if (cnpjErr) {
-      setErro(cnpjErr);
+    if (!nome.trim()) {
+      setErro("Digite o nome do estabelecimento.");
       return;
     }
     setBuscando(true);
     try {
-      const empresa = await buscarEmpresaPorCnpj(cnpj.replace(/\D/g, ""));
-      const lista = await listarEstabelecimentosPorEmpresa(empresa.id);
+      const lista = await buscarEstabelecimentosPorNome(nome.trim());
       if (lista.length === 0) {
-        setErro("Nenhum estabelecimento encontrado para este CNPJ.");
+        setErro("Nenhum estabelecimento encontrado.");
       } else {
         setEstabelecimentos(lista);
         if (lista.length === 1) setEstabelecimento(lista[0]);
       }
     } catch {
-      setErro("Empresa não encontrada.");
+      setErro("Erro ao buscar estabelecimentos.");
     } finally {
       setBuscando(false);
     }
@@ -157,20 +155,21 @@ function NovaAvaliacaoModal({
           Nova avaliação
         </h2>
         <p className="mt-1 text-[13px] text-[#6b7280]">
-          Busque a empresa pelo CNPJ, selecione o estabelecimento e defina a data.
+          Busque o estabelecimento pelo nome, selecione e defina a data.
         </p>
 
         <div className="mt-5 flex flex-col gap-4">
           <div>
             <label className="mb-1.5 block text-[13px] font-semibold text-[#2e2e2e]">
-              CNPJ da empresa
+              Nome do estabelecimento
             </label>
             <div className="flex gap-2">
               <input
                 type="text"
-                placeholder="00.000.000/0000-00"
-                value={cnpj}
-                onChange={(e) => { setCnpj(maskCNPJ(e.target.value)); setEstabelecimentos([]); setEstabelecimento(null); }}
+                placeholder="Ex: Restaurante Central"
+                value={nome}
+                onChange={(e) => { setNome(e.target.value); setEstabelecimentos([]); setEstabelecimento(null); }}
+                onKeyDown={(e) => e.key === "Enter" && buscarEstabelecimentos()}
                 className="h-[40px] flex-1 rounded-lg border border-[#9e9e9e]/30 px-3 text-[14px] text-[#2e2e2e] outline-none focus:border-[#0f62ac]/50"
               />
               <button
