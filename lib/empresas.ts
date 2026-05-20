@@ -64,7 +64,8 @@ export async function listarEstabelecimentosPorEmpresa(
 export async function buscarEstabelecimentosPorNome(
   nome: string
 ): Promise<Estabelecimento[]> {
-  return apiFetch(`/api/estabelecimentos?nome=${encodeURIComponent(nome)}`);
+  const query = nome ? `?nome=${encodeURIComponent(nome)}` : "";
+  return apiFetch(`/api/estabelecimentos${query}`);
 }
 
 export async function criarEstabelecimento(data: {
