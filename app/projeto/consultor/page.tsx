@@ -73,24 +73,30 @@ function NovaAvaliacaoModal({
   }
 
   async function salvar() {
-    if (!estabelecimento) {
-      setErro("Selecione um estabelecimento.");
-      return;
-    }
     const dataErr = validateDataAgendada(dataAgendada);
-    if (dataErr) {
-      setErro(dataErr);
-      return;
-    }
+    if (dataErr) { setErro(dataErr); return; }
+
     setSalvando(true);
     setErro(null);
     try {
+      let alvo = estabelecimento;
+
+      if (!alvo) {
+        if (!nome.trim()) { setErro("Digite o nome do estabelecimento."); return; }
+        const lista = await buscarEstabelecimentosPorNome(nome.trim());
+        if (lista.length === 0) { setErro("Nenhum estabelecimento encontrado."); return; }
+        if (lista.length > 1) {
+          setEstabelecimentos(lista);
+          setErro("Mais de um estabelecimento encontrado. Selecione um na lista.");
+          return;
+        }
+        alvo = lista[0];
+        setEstabelecimento(alvo);
+      }
+
       const data = await apiFetch("/api/avaliacoes", {
         method: "POST",
-        body: JSON.stringify({
-          estabelecimentoId: estabelecimento.id,
-          dataAgendada,
-        }),
+        body: JSON.stringify({ estabelecimentoId: alvo.id, dataAgendada }),
       });
       onCriada();
       setCodigoCriado(data.id);
@@ -239,7 +245,7 @@ function NovaAvaliacaoModal({
           </button>
           <button
             onClick={salvar}
-            disabled={salvando || !estabelecimento}
+            disabled={salvando || !nome.trim() || !dataAgendada}
             className="h-[40px] flex-1 rounded-full bg-[#0f62ac] text-[13px] font-semibold text-white transition-colors hover:bg-[#0f62ac]/90 disabled:opacity-50"
           >
             {salvando ? "Criando..." : "Criar avaliação"}
