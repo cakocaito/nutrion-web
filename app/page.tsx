@@ -101,12 +101,14 @@ export default function LandingPage() {
           >
             Começar
           </Link>
-          <Link
-            href="/sobre"
+          <a
+            href="https://redcap.uff.br/redcap/surveys/?s=TPJ4PMEMDL7AA98X"
+            target="_blank"
+            rel="noopener noreferrer"
             className="inline-flex h-[45px] items-center justify-center rounded-full border-2 border-[#0f62ac] px-7 text-[16px] font-medium text-[#0f62ac] transition-colors hover:bg-[#0f62ac]/5"
           >
-            Conhecer
-          </Link>
+            Responder Pesquisa
+          </a>
         </div>
 
         {/* Partner logos */}

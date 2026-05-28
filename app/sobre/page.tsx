@@ -66,12 +66,9 @@ export default function SobrePage() {
               NutriSec
             </span>
           </Link>
-          <Link
-            href="/login"
-            className="inline-flex h-[36px] items-center justify-center rounded-full bg-[#0f62ac] px-5 text-[13px] font-semibold text-white transition-colors hover:bg-[#0f62ac]/90"
-          >
-            Começar
-          </Link>
+          <span className="text-[14px] font-semibold text-[#2e2e2e]">
+            Sobre
+          </span>
         </div>
       </header>
 
