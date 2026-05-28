@@ -1,5 +1,8 @@
+"use client";
+
 import Image from "next/image";
 import Link from "next/link";
+import { useAuth } from "@/context/AuthContext";
 
 const pesquisadores = [
   { nome: "Maria das Graças G. A. Medeiros", faculdade: "Nutrição" },
@@ -47,6 +50,9 @@ const classificacoes = [
 ];
 
 export default function SobrePage() {
+  const { user } = useAuth();
+  const startHref = user ? "/home" : "/login";
+
   return (
     <div className="min-h-screen bg-[#f8fafb]">
       {/* Header */}
@@ -67,7 +73,7 @@ export default function SobrePage() {
             </span>
           </Link>
           <Link
-            href="/login"
+            href={startHref}
             className="inline-flex h-[36px] items-center justify-center rounded-full bg-[#0f62ac] px-5 text-[13px] font-semibold text-white transition-colors hover:bg-[#0f62ac]/90"
           >
             Começar
@@ -289,7 +295,7 @@ export default function SobrePage() {
             avaliar a segurança alimentar dos seus estabelecimentos.
           </p>
           <Link
-            href="/login"
+            href={startHref}
             className="inline-flex h-[44px] items-center justify-center rounded-full bg-[#0f62ac] px-8 text-[14px] font-semibold text-white transition-colors hover:bg-[#0f62ac]/90"
           >
             Começar agora
