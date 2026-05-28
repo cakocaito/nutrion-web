@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { login } from "@/lib/auth";
 import { useAuth } from "@/context/AuthContext";
@@ -9,11 +9,15 @@ import { validateEmail, validatePassword } from "@/lib/validators";
 
 export default function Login() {
   const router = useRouter();
-  const { setUser } = useAuth();
+  const { user, setUser } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (user) router.replace("/home");
+  }, [user, router]);
 
   async function handleLogin() {
     setError("");
