@@ -975,10 +975,21 @@ export function ProjectCard({
       <div className="mt-4 flex items-center justify-between text-[12px] text-[#6b7280]">
         <span>{date}</span>
         <div className="flex items-center gap-2">
-          {status === "pendente" && id && (
-            <span className="rounded-md bg-[#f1f8fc] px-2 py-0.5 font-mono font-semibold text-[#0f62ac]">
-              id_pesquisa: {id}
-            </span>
+          {(status === "pendente" || status === "em_andamento") && id && (
+            <a
+              href={`https://redcap.uff.br/redcap/surveys/?s=TPJ4PMEMDL7AA98X&id_pesquisa=${id}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1.5 rounded-full bg-[#0f62ac]/10 px-3 py-1 text-[11px] font-semibold text-[#0f62ac] transition-colors hover:bg-[#0f62ac]/20"
+            >
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2" />
+                <rect x="9" y="3" width="6" height="4" rx="1" />
+                <line x1="9" y1="12" x2="15" y2="12" />
+                <line x1="9" y1="16" x2="13" y2="16" />
+              </svg>
+              Preencher checklist
+            </a>
           )}
           {id && (
             <button
