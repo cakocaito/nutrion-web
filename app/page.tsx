@@ -1,7 +1,13 @@
+"use client";
+
 import Image from "next/image";
 import Link from "next/link";
+import { useAuth } from "@/context/AuthContext";
 
 export default function LandingPage() {
+  const { user } = useAuth();
+  const startHref = user ? "/home" : "/login";
+
   return (
     <div className="relative min-h-screen overflow-hidden bg-[#f1f8fc]">
       {/* ── Background decorative ellipses ── */}
@@ -90,7 +96,7 @@ export default function LandingPage() {
         {/* Buttons */}
         <div className="mt-8 flex items-center gap-5 sm:mt-10">
           <Link
-            href="/login"
+            href={startHref}
             className="inline-flex h-[45px] items-center justify-center rounded-full bg-[#0f62ac] px-10 text-[16px] font-medium text-white transition-colors hover:bg-[#0f62ac]/90"
           >
             Começar
