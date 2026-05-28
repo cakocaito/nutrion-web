@@ -55,6 +55,14 @@ export default function LandingPage() {
         />
       </a>
 
+      {/* ── Sobre link top-right ── */}
+      <Link
+        href="/sobre"
+        className="absolute right-[30px] top-[45px] z-20 text-[14px] font-semibold text-[#0f62ac] transition-opacity hover:opacity-70 sm:right-[50px] sm:top-[55px]"
+      >
+        Sobre
+      </Link>
+
       {/* ── Hero illustration (right side, desktop) ── */}
       <div className="pointer-events-none absolute right-[0px] top-[50%] hidden -translate-y-[55%] lg:block xl:right-[40px]">
         <div className="relative h-[520px] w-[520px]">
