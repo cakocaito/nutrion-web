@@ -4,6 +4,8 @@ import Image from "next/image";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { register } from "@/lib/register";
+import { login } from "@/lib/auth";
+import { useAuth } from "@/context/AuthContext";
 import {
   maskCPF,
   validateCPF,
@@ -43,6 +45,7 @@ function FieldError({ msg }: { msg?: string }) {
 
 export default function CadastroConsultor() {
   const router = useRouter();
+  const { setUser } = useAuth();
   const [form, setForm] = useState({
     codigoConvite: "",
     nomeCompleto: "",
@@ -109,7 +112,9 @@ export default function CadastroConsultor() {
         email: form.email,
         password: form.password,
       });
-      router.push("/login");
+      const user = await login(form.email, form.password);
+      setUser(user);
+      router.push("/home");
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : "Erro ao cadastrar.");
     } finally {
