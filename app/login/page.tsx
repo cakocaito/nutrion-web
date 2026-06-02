@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { login } from "@/lib/auth";
 import { useAuth } from "@/context/AuthContext";
 import { validateEmail, validatePassword } from "@/lib/validators";
+import { apiFetch } from "@/lib/api";
 
 export default function Login() {
   const router = useRouter();
@@ -14,10 +15,31 @@ export default function Login() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [recuperarAberto, setRecuperarAberto] = useState(false);
+  const [recuperarEmail, setRecuperarEmail] = useState("");
+  const [recuperarLoading, setRecuperarLoading] = useState(false);
+  const [recuperarMsg, setRecuperarMsg] = useState("");
 
   useEffect(() => {
     if (user) router.replace("/home");
   }, [user, router]);
+
+  async function handleRecuperar() {
+    if (!recuperarEmail) return;
+    setRecuperarLoading(true);
+    setRecuperarMsg("");
+    try {
+      await apiFetch("/api/auth/recuperar-senha", {
+        method: "POST",
+        body: JSON.stringify({ email: recuperarEmail }),
+      });
+      setRecuperarMsg("Se o e-mail estiver cadastrado, você receberá as instruções em breve.");
+    } catch {
+      setRecuperarMsg("Erro ao enviar. Tente novamente.");
+    } finally {
+      setRecuperarLoading(false);
+    }
+  }
 
   async function handleLogin() {
     setError("");
@@ -126,8 +148,58 @@ export default function Login() {
             >
               {loading ? "Entrando..." : "Continuar"}
             </button>
+
+            <button
+              type="button"
+              onClick={() => { setRecuperarAberto(true); setRecuperarMsg(""); }}
+              className="text-[13px] font-medium text-[#0f62ac] hover:underline"
+            >
+              Esqueceu a senha?
+            </button>
           </div>
         </div>
+
+        {/* Modal recuperar senha */}
+        {recuperarAberto && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
+            <div className="w-full max-w-[400px] rounded-2xl bg-white p-6 shadow-xl">
+              <div className="flex items-center justify-between">
+                <h2 className="font-[family-name:var(--font-heading)] text-[17px] font-bold text-[#2e2e2e]">
+                  Recuperar senha
+                </h2>
+                <button onClick={() => setRecuperarAberto(false)} className="text-[#9ca3af] hover:text-[#2e2e2e]">✕</button>
+              </div>
+              <p className="mt-2 text-[13px] text-[#6b7280]">
+                Digite seu e-mail e enviaremos as instruções para redefinir sua senha.
+              </p>
+              <input
+                type="email"
+                placeholder="Seu e-mail"
+                value={recuperarEmail}
+                onChange={(e) => setRecuperarEmail(e.target.value)}
+                className="mt-4 h-[44px] w-full rounded-lg border border-[#e5eaf0] bg-[#f8fafb] px-4 text-[13px] outline-none focus:border-[#0f62ac]/50"
+              />
+              {recuperarMsg && (
+                <p className="mt-2 text-[12px] text-[#0f62ac]">{recuperarMsg}</p>
+              )}
+              <div className="mt-4 flex gap-2">
+                <button
+                  onClick={() => setRecuperarAberto(false)}
+                  className="h-[38px] flex-1 rounded-full border border-[#e5eaf0] text-[13px] font-semibold text-[#6b7280] hover:bg-[#f8fafb]"
+                >
+                  Cancelar
+                </button>
+                <button
+                  onClick={handleRecuperar}
+                  disabled={recuperarLoading}
+                  className="h-[38px] flex-1 rounded-full bg-[#0f62ac] text-[13px] font-semibold text-white hover:bg-[#0f62ac]/90 disabled:opacity-50"
+                >
+                  {recuperarLoading ? "Enviando..." : "Enviar"}
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
 
         <div className="mt-10 flex flex-col items-center sm:mt-14">
           <div className="mb-6 h-px w-full bg-[#9e9e9e]/15 sm:mb-8" />

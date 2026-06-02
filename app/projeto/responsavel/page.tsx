@@ -42,6 +42,100 @@ function mapStatus(status: Avaliacao["status"]): "pendente" | "em_andamento" | "
   }
 }
 
+function NovaAvaliacaoResponsavelModal({
+  estabelecimentos,
+  onClose,
+  onCriada,
+}: {
+  estabelecimentos: { id: number; nome: string }[];
+  onClose: () => void;
+  onCriada: () => void;
+}) {
+  const [estabelecimentoId, setEstabelecimentoId] = useState<number | "">(
+    estabelecimentos.length === 1 ? estabelecimentos[0].id : ""
+  );
+  const [dataAgendada, setDataAgendada] = useState("");
+  const [salvando, setSalvando] = useState(false);
+  const [erro, setErro] = useState<string | null>(null);
+
+  async function salvar() {
+    if (!estabelecimentoId) { setErro("Selecione um estabelecimento."); return; }
+    if (!dataAgendada) { setErro("Informe a data agendada."); return; }
+    setSalvando(true);
+    setErro(null);
+    try {
+      await apiFetch("/api/avaliacoes", {
+        method: "POST",
+        body: JSON.stringify({ estabelecimentoId, dataAgendada }),
+      });
+      onCriada();
+      onClose();
+    } catch (e: unknown) {
+      setErro(e instanceof Error ? e.message : "Erro ao criar avaliação.");
+    } finally {
+      setSalvando(false);
+    }
+  }
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
+      <div className="w-full max-w-[440px] rounded-2xl bg-white p-6 shadow-xl">
+        <div className="flex items-center justify-between">
+          <h2 className="font-[family-name:var(--font-heading)] text-[18px] font-bold text-[#2e2e2e]">
+            Nova avaliação
+          </h2>
+          <button onClick={onClose} className="flex size-8 items-center justify-center rounded-full text-[#9ca3af] hover:bg-[#f8fafb] hover:text-[#2e2e2e]">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" />
+            </svg>
+          </button>
+        </div>
+
+        <div className="mt-5 flex flex-col gap-4">
+          <div>
+            <label className="mb-1.5 block text-[12px] font-semibold text-[#2e2e2e]">Estabelecimento</label>
+            <select
+              value={estabelecimentoId}
+              onChange={(e) => setEstabelecimentoId(Number(e.target.value))}
+              className="h-[40px] w-full rounded-lg border border-[#e5eaf0] bg-[#f8fafb] px-3 text-[13px] text-[#2e2e2e] outline-none focus:border-[#0f62ac]/50"
+            >
+              <option value="">Selecione...</option>
+              {estabelecimentos.map((est) => (
+                <option key={est.id} value={est.id}>{est.nome}</option>
+              ))}
+            </select>
+          </div>
+
+          <div>
+            <label className="mb-1.5 block text-[12px] font-semibold text-[#2e2e2e]">Data agendada</label>
+            <input
+              type="date"
+              value={dataAgendada}
+              onChange={(e) => setDataAgendada(e.target.value)}
+              className="h-[40px] w-full rounded-lg border border-[#e5eaf0] bg-[#f8fafb] px-3 text-[13px] text-[#2e2e2e] outline-none focus:border-[#0f62ac]/50"
+            />
+          </div>
+
+          {erro && <p className="rounded-lg bg-red-50 px-3 py-2 text-[12px] text-red-600">{erro}</p>}
+
+          <div className="flex gap-2 pt-1">
+            <button onClick={onClose} className="h-[38px] flex-1 rounded-full border border-[#e5eaf0] text-[13px] font-semibold text-[#6b7280] hover:bg-[#f8fafb]">
+              Cancelar
+            </button>
+            <button
+              onClick={salvar}
+              disabled={salvando}
+              className="h-[38px] flex-1 rounded-full bg-[#0f62ac] text-[13px] font-semibold text-white transition-colors hover:bg-[#0f62ac]/90 disabled:opacity-50"
+            >
+              {salvando ? "Criando..." : "Criar avaliação"}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function PainelResponsavel({ empresaId, onNovoEmpreendimento }: { empresaId: number; onNovoEmpreendimento: () => void }) {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -50,6 +144,22 @@ function PainelResponsavel({ empresaId, onNovoEmpreendimento }: { empresaId: num
   const [loadingAvaliacoes, setLoadingAvaliacoes] = useState(true);
   const [filtroStatus, setFiltroStatus] = useState("todos");
   const [busca, setBusca] = useState("");
+  const [modalAberto, setModalAberto] = useState(false);
+  const [estabelecimentos, setEstabelecimentos] = useState<{ id: number; nome: string }[]>([]);
+
+  useEffect(() => {
+    apiFetch(`/api/estabelecimentos?empresaId=${empresaId}`)
+      .then((lista: any[]) => setEstabelecimentos(lista.filter((e) => e.ativo).map((e) => ({ id: e.id, nome: e.nome }))))
+      .catch(() => {});
+  }, [empresaId]);
+
+  function recarregarAvaliacoes() {
+    setLoadingAvaliacoes(true);
+    apiFetch("/api/avaliacoes")
+      .then(setAvaliacoes)
+      .catch(() => {})
+      .finally(() => setLoadingAvaliacoes(false));
+  }
 
   useEffect(() => {
     apiFetch("/api/avaliacoes")
@@ -81,6 +191,14 @@ function PainelResponsavel({ empresaId, onNovoEmpreendimento }: { empresaId: num
         <TopBar role="responsavel" onMenuToggle={() => setMobileMenuOpen(true)} />
 
         <main className="flex-1 px-4 py-6 sm:px-6 lg:px-8">
+          {modalAberto && (
+            <NovaAvaliacaoResponsavelModal
+              estabelecimentos={estabelecimentos}
+              onClose={() => setModalAberto(false)}
+              onCriada={recarregarAvaliacoes}
+            />
+          )}
+
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <div>
               <h1 className="font-[family-name:var(--font-heading)] text-[22px] font-bold text-[#2e2e2e] sm:text-[26px]">
@@ -92,6 +210,14 @@ function PainelResponsavel({ empresaId, onNovoEmpreendimento }: { empresaId: num
                   : "Estabelecimentos vinculados à sua empresa"}
               </p>
             </div>
+            {aba === "avaliacoes" && (
+              <button
+                onClick={() => setModalAberto(true)}
+                className="inline-flex h-[38px] items-center gap-2 rounded-full bg-[#0f62ac] px-5 text-[13px] font-semibold text-white transition-colors hover:bg-[#0f62ac]/90"
+              >
+                + Nova avaliação
+              </button>
+            )}
             {aba === "empreendimentos" && (
               <button
                 onClick={onNovoEmpreendimento}
