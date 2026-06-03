@@ -302,7 +302,7 @@ function PainelResponsavel({ empresaId, onNovoEmpreendimento }: { empresaId: num
                     title={a.estabelecimentoNome}
                     institution={a.estabelecimentoOrganizacao ?? "—"}
                     status={mapStatus(a.status)}
-                    date={new Date(a.dataAgendada).toLocaleDateString("pt-BR", { month: "short", year: "numeric" })}
+                    date={new Date(a.dataAgendada).toLocaleDateString("pt-BR", { day: "2-digit", month: "short", year: "numeric" })}
                     members={0}
                     temRelatorio={a.temRelatorio}
                   />
