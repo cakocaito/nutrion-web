@@ -45,7 +45,15 @@ function FieldError({ msg }: { msg?: string }) {
 
 export default function CadastroConsultor() {
   const router = useRouter();
-  const { setUser } = useAuth();
+  const { user, setUser } = useAuth();
+
+  useEffect(() => {
+    router.prefetch("/home");
+  }, [router]);
+
+  useEffect(() => {
+    if (user) router.replace("/home");
+  }, [user, router]);
   const [form, setForm] = useState({
     codigoConvite: "",
     nomeCompleto: "",
@@ -114,7 +122,6 @@ export default function CadastroConsultor() {
       });
       const user = await login(form.email, form.password);
       setUser(user);
-      router.push("/home");
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : "Erro ao cadastrar.");
     } finally {

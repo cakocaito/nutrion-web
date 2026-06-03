@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { register } from "@/lib/register";
 import { login } from "@/lib/auth";
@@ -45,7 +45,15 @@ function FieldError({ msg }: { msg?: string }) {
 
 export default function CadastroResponsavel() {
   const router = useRouter();
-  const { setUser } = useAuth();
+  const { user, setUser } = useAuth();
+
+  useEffect(() => {
+    router.prefetch("/home");
+  }, [router]);
+
+  useEffect(() => {
+    if (user) router.replace("/home");
+  }, [user, router]);
   const [form, setForm] = useState({
     codigoConvite: "",
     nomeCompleto: "",
@@ -114,7 +122,6 @@ export default function CadastroResponsavel() {
       });
       const user = await login(form.email, form.password);
       setUser(user);
-      router.push("/home");
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : "Erro ao cadastrar.");
     } finally {
