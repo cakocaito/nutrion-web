@@ -5,6 +5,7 @@ import { useParams, useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
 import { Sidebar, MobileSidebar, TopBar } from "@/app/projeto/components";
 import { apiFetch } from "@/lib/api";
+import { patogenosPorItem } from "@/lib/pathogens";
 import {
   Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis,
   ResponsiveContainer, Tooltip,
@@ -446,6 +447,18 @@ export default function RelatorioPage() {
                 </div>
               </div>
 
+              {/* ── Legenda ── */}
+              <div className="print-section flex flex-wrap gap-4 rounded-2xl bg-white px-6 py-4 text-[12px]">
+                <div className="flex items-center gap-2">
+                  <span className="inline-block size-3 rounded-full bg-red-400" />
+                  <span className="text-[#4a5568]">Não conforme <span className="font-semibold text-red-600">com penalidade na pontuação de risco</span></span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="inline-block size-3 rounded-full bg-amber-400" />
+                  <span className="text-[#4a5568]">Não conforme <span className="font-semibold text-amber-600">sem penalidade na pontuação</span></span>
+                </div>
+              </div>
+
               {/* ── Seções ── ordenadas por gravidade: penalidade > não conforme > conforme */}
               {[...relatorio.secoes]
                 .sort((a, b) => {
@@ -645,9 +658,26 @@ export default function RelatorioPage() {
                                         {item.descricao}
                                       </p>
                                       {item.pontuacao > 0 && (
-                                        <span className="mt-1 text-[11px] font-semibold text-red-500">
+                                        <span className="mt-1 inline-block text-[11px] font-semibold text-red-500">
                                           +{item.pontuacao.toFixed(1)} pts
                                         </span>
+                                      )}
+                                      {patogenosPorItem[item.ref]?.length > 0 && (
+                                        <div className="mt-2">
+                                          <p className="text-[10px] font-semibold uppercase tracking-wider text-[#718096]">
+                                            Patógenos relacionados
+                                          </p>
+                                          <div className="mt-1 flex flex-wrap gap-1">
+                                            {patogenosPorItem[item.ref].map((p) => (
+                                              <span
+                                                key={p}
+                                                className="rounded-full bg-orange-50 px-2 py-0.5 text-[10px] font-medium italic text-orange-700"
+                                              >
+                                                {p}
+                                              </span>
+                                            ))}
+                                          </div>
+                                        </div>
                                       )}
                                     </div>
                                   </div>
