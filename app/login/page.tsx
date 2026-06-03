@@ -52,8 +52,6 @@ export default function Login() {
     try {
       const user = await login(email, password);
       setUser(user);
-
-      router.push("/home");
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : "Erro ao fazer login.");
     } finally {
