@@ -79,7 +79,7 @@ export default function SobrePage() {
             Sobre o <span className="text-[#0f62ac]">NutriSec UFF</span>
           </h1>
           <p className="mx-auto mt-3 max-w-[640px] text-[14px] leading-relaxed text-[#6b7280] sm:text-[15px]">
-            Sistema digital de avaliação de segurança alimentar desenvolvido na
+            Sistema digital de avaliação de segurança dos alimentos desenvolvido na
             Universidade Federal Fluminense.
           </p>
         </div>
@@ -283,7 +283,7 @@ export default function SobrePage() {
           </h2>
           <p className="max-w-[460px] text-[14px] text-[#6b7280]">
             Crie sua conta como responsável técnico ou consultor e comece a
-            avaliar a segurança alimentar dos seus estabelecimentos.
+            avaliar a segurança dos alimentos dos seus estabelecimentos.
           </p>
           <Link
             href="/login"

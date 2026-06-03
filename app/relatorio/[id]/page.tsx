@@ -139,7 +139,7 @@ function ClassificacaoModal({ onClose }: { onClose: () => void }) {
               color: "border-red-200 bg-red-50 text-red-700",
               dot: "bg-red-500",
               titulo: "Condições inadequadas",
-              desc: "Alto nível de não conformidades. Pontuação igual ou superior a 502,7 pontos. Exige ação corretiva imediata para garantir a segurança alimentar.",
+              desc: "Alto nível de não conformidades. Pontuação igual ou superior a 502,7 pontos. Exige ação corretiva imediata para garantir a segurança dos alimentos.",
               range: "≥ 502,7 e < 1152,3",
             },
             {
@@ -417,6 +417,9 @@ export default function RelatorioPage() {
                     <p className={`text-[15px] font-bold ${relatorio.cumpriuEliminatorios ? "text-emerald-700" : "text-red-700"}`}>
                       {relatorio.cumpriuEliminatorios ? "Cumpriu" : "Não cumpriu"}
                     </p>
+                    <p className="mt-1 text-[11px] text-[#6b7280] leading-snug">
+                      Requisitos cuja não conformidade representa risco imediato à saúde. Não cumprimento resulta em classificação Pendente.
+                    </p>
                   </div>
                 </div>
                 <div className={`overflow-hidden rounded-2xl border ${relatorio.cumpriuClassificatorios ? "border-emerald-200" : "border-red-200"}`}>
@@ -426,6 +429,9 @@ export default function RelatorioPage() {
                   <div className={`px-4 py-3 ${relatorio.cumpriuClassificatorios ? "bg-emerald-50" : "bg-red-50"}`}>
                     <p className={`text-[15px] font-bold ${relatorio.cumpriuClassificatorios ? "text-emerald-700" : "text-red-700"}`}>
                       {relatorio.cumpriuClassificatorios ? "Cumpriu" : "Não cumpriu"}
+                    </p>
+                    <p className="mt-1 text-[11px] text-[#6b7280] leading-snug">
+                      Itens que determinam a categoria de risco quando violados. Não cumprimento resulta em classificação C, independentemente da pontuação.
                     </p>
                   </div>
                 </div>
@@ -729,7 +735,7 @@ export default function RelatorioPage() {
                   <p className="text-[13px] leading-relaxed text-[#4a5568]">
                     {relatorio.categoria === "A" && "O estabelecimento apresenta baixo nível de não conformidades sanitárias, com pontuação inferior a 13,3 pontos. Indica que as boas práticas estão sendo seguidas adequadamente."}
                     {relatorio.categoria === "B" && "O estabelecimento apresenta nível intermediário de não conformidades, com pontuação entre 13,3 e 502,7 pontos. Requer atenção e implementação de melhorias para evitar riscos sanitários."}
-                    {relatorio.categoria === "C" && "O estabelecimento apresenta alto nível de não conformidades, com pontuação igual ou superior a 502,7 pontos. Exige ação corretiva imediata para garantir a segurança alimentar."}
+                    {relatorio.categoria === "C" && "O estabelecimento apresenta alto nível de não conformidades, com pontuação igual ou superior a 502,7 pontos. Exige ação corretiva imediata para garantir a segurança dos alimentos."}
                     {relatorio.categoria === "Pendente" && !relatorio.cumpriuEliminatorios && "O estabelecimento não cumpriu os critérios eliminatórios relacionados ao abastecimento de água. Independentemente da pontuação geral, essa condição exige ação imediata da vigilância sanitária."}
                     {relatorio.categoria === "Pendente" && relatorio.cumpriuEliminatorios && "O estabelecimento atingiu pontuação igual ou superior a 1.152,4 pontos, indicando nível crítico de não conformidades. A vigilância sanitária adotará as medidas necessárias para garantir a segurança do serviço."}
                   </p>
@@ -778,7 +784,7 @@ export default function RelatorioPage() {
 
               {/* ── Footer ── */}
               <p className="pb-4 text-center text-[11px] text-[#a0aec0]">
-                Relatório gerado em {new Date(relatorio.dataGeracao).toLocaleDateString("pt-BR")} · NutriSec UFF — Sistema de avaliação de segurança alimentar
+                Relatório gerado em {new Date(relatorio.dataGeracao).toLocaleDateString("pt-BR")} · NutriSec UFF — Sistema de avaliação de segurança dos alimentos
               </p>
             </div>
           )}

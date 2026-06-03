@@ -203,7 +203,7 @@ export default function PerfilPage() {
             <div className="mt-4 rounded-2xl border border-[#e5eaf0] bg-white p-6">
               <h2 className="text-[15px] font-bold text-[#2e2e2e]">Privacidade e dados</h2>
               <p className="mt-2 text-[13px] leading-relaxed text-[#6b7280]">
-                Seus dados são utilizados exclusivamente para fins de avaliação de segurança alimentar no âmbito do projeto NutriSec UFF, em conformidade com a LGPD (Lei nº 13.709/2018). Para solicitações de exclusão ou portabilidade de dados, entre em contato com o administrador.
+                Seus dados são utilizados exclusivamente para fins de avaliação de segurança dos alimentos no âmbito do projeto NutriSec UFF, em conformidade com a LGPD (Lei nº 13.709/2018). Para solicitações de exclusão ou portabilidade de dados, entre em contato com o administrador.
               </p>
             </div>
           </div>

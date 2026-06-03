@@ -98,7 +98,7 @@ export default function HomePage() {
                 Olá, {firstName} 👋
               </h1>
               <p className="mt-0.5 text-[14px] text-[#6b7280]">
-                Bem-vindo ao NutriSec UFF — Sistema de avaliação de segurança alimentar
+                Bem-vindo ao NutriSec UFF — Sistema de avaliação de segurança dos alimentos
               </p>
             </div>
             <button
