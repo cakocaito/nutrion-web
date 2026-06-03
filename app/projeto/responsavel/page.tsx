@@ -34,11 +34,12 @@ interface Avaliacao {
   temRelatorio: boolean;
 }
 
-function mapStatus(status: Avaliacao["status"]): "pendente" | "em_andamento" | "concluido" {
+function mapStatus(status: Avaliacao["status"]): "agendada" | "em_andamento" | "concluido" | "cancelado" {
   switch (status) {
-    case "Concluida": return "concluido";
+    case "Concluida":   return "concluido";
     case "EmAndamento": return "em_andamento";
-    default: return "pendente";
+    case "Cancelada":   return "cancelado";
+    default:            return "agendada";
   }
 }
 
@@ -167,6 +168,22 @@ function PainelResponsavel({ empresaId, onNovoEmpreendimento }: { empresaId: num
       .catch(() => {})
       .finally(() => setLoadingAvaliacoes(false));
   }, []);
+
+  // Polling inteligente: só ativa quando há avaliações sem relatório
+  useEffect(() => {
+    const temPendente = avaliacoes.some(
+      (a) => !a.temRelatorio && (a.status === "Agendada" || a.status === "EmAndamento")
+    );
+    if (!temPendente) return;
+
+    const interval = setInterval(() => {
+      apiFetch("/api/avaliacoes")
+        .then(setAvaliacoes)
+        .catch(() => {});
+    }, 15000);
+
+    return () => clearInterval(interval);
+  }, [avaliacoes]);
 
   const avaliacoesFiltradas = avaliacoes.filter((a) => {
     const matchBusca = a.estabelecimentoNome.toLowerCase().includes(busca.toLowerCase());

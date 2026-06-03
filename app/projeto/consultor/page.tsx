@@ -23,11 +23,12 @@ interface Avaliacao {
 
 type Estabelecimento = EstabelecimentoLib;
 
-function mapStatus(status: Avaliacao["status"]): "pendente" | "em_andamento" | "concluido" {
+function mapStatus(status: Avaliacao["status"]): "agendada" | "em_andamento" | "concluido" | "cancelado" {
   switch (status) {
-    case "Concluida": return "concluido";
+    case "Concluida":   return "concluido";
     case "EmAndamento": return "em_andamento";
-    default: return "pendente";
+    case "Cancelada":   return "cancelado";
+    default:            return "agendada";
   }
 }
 
@@ -275,12 +276,28 @@ export default function ProjetoConsultor() {
     carregarAvaliacoes();
   }, []);
 
+  // Polling inteligente: só ativa quando há avaliações sem relatório
+  useEffect(() => {
+    const temPendente = avaliacoes.some(
+      (a) => !a.temRelatorio && (a.status === "Agendada" || a.status === "EmAndamento")
+    );
+    if (!temPendente) return;
+
+    const interval = setInterval(() => {
+      apiFetch("/api/avaliacoes")
+        .then(setAvaliacoes)
+        .catch(() => {});
+    }, 15000);
+
+    return () => clearInterval(interval);
+  }, [avaliacoes]);
+
   const avaliacoesFiltradas = avaliacoes.filter((a) => {
     const matchBusca = a.estabelecimentoNome.toLowerCase().includes(busca.toLowerCase());
     const matchStatus =
       filtroStatus === "todos"
         ? a.status !== "Cancelada"
-        : (filtroStatus === "pendente" && a.status === "Agendada") ||
+        : (filtroStatus === "agendada" && a.status === "Agendada") ||
           (filtroStatus === "em_andamento" && a.status === "EmAndamento") ||
           (filtroStatus === "concluido" && a.status === "Concluida") ||
           (filtroStatus === "cancelada" && a.status === "Cancelada");
@@ -363,7 +380,7 @@ export default function ProjetoConsultor() {
                 <div className="flex flex-wrap gap-1.5">
                   {[
                     { key: "todos", label: "Todos" },
-                    { key: "pendente", label: "Agendadas" },
+                    { key: "agendada", label: "Agendadas" },
                     { key: "em_andamento", label: "Em andamento" },
                     { key: "concluido", label: "Concluídas" },
                     { key: "cancelada", label: "Canceladas" },

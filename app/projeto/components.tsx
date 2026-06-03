@@ -884,7 +884,7 @@ export function ProjectCard({
   id?: number;
   title: string;
   institution: string;
-  status: "em_andamento" | "concluido" | "pendente";
+  status: "em_andamento" | "concluido" | "agendada" | "cancelado";
   date: string;
   members: number;
   temRelatorio?: boolean;
@@ -897,8 +897,9 @@ export function ProjectCard({
 
   const statusMap = {
     em_andamento: { label: "Em andamento", color: "bg-[#0f62ac]/10 text-[#0f62ac]" },
-    concluido: { label: "Concluída", color: "bg-emerald-50 text-emerald-600" },
-    pendente: { label: "Pendente", color: "bg-amber-50 text-amber-600" },
+    concluido:    { label: "Concluída",    color: "bg-emerald-50 text-emerald-600" },
+    agendada:     { label: "Agendada",     color: "bg-amber-50 text-amber-600" },
+    cancelado:    { label: "Cancelada",    color: "bg-gray-100 text-gray-400" },
   };
 
   const s = statusMap[status];
@@ -937,7 +938,7 @@ export function ProjectCard({
           <span className={`shrink-0 rounded-full px-3 py-1 text-[11px] font-semibold ${s.color}`}>
             {s.label}
           </span>
-          {status === "pendente" && id && !confirmando && (
+          {status === "agendada" && id && !confirmando && (
             <button
               onClick={() => setConfirmando(true)}
               title="Cancelar avaliação"
@@ -975,7 +976,7 @@ export function ProjectCard({
       <div className="mt-4 flex items-center justify-between text-[12px] text-[#6b7280]">
         <span>{date}</span>
         <div className="flex items-center gap-2">
-          {(status === "pendente" || status === "em_andamento") && id && (
+          {(status === "agendada" || status === "em_andamento") && id && (
             <a
               href={`https://redcap.uff.br/redcap/surveys/?s=TPJ4PMEMDL7AA98X&id_pesquisa=${id}`}
               target="_blank"

@@ -87,18 +87,19 @@ export default function LandingPage() {
       <div className="relative z-10 flex min-h-screen flex-col justify-center px-6 py-20 sm:px-[50px] lg:max-w-[55%]">
         {/* Title */}
         <h1 className="font-[family-name:var(--font-heading)] text-[36px] font-bold leading-[1.05] tracking-[-1.5px] text-[#2e2e2e] sm:text-[48px] sm:tracking-[-2px] lg:text-[60px] lg:tracking-[-2.4px]">
-          <span className="text-[#0f62ac]">Facilitando</span> a avaliação
-          de serviços alimentares.
+          <span className="text-[#0f62ac]">Automatizando</span> a avaliação
+          de segurança dos alimentos.
         </h1>
 
         {/* Description paragraph */}
         <p className="mt-8 max-w-[785px] text-[15px] font-medium leading-[1.4] tracking-[-0.34px] text-[#2e2e2e]/80 sm:text-[17px]">
           As Doenças de Transmissão Hídrica e Alimentar representam um dos
           maiores desafios de saúde pública no mundo. O NutriSec é um sistema
-          digital desenvolvido na Universidade Federal Fluminense que simplifica
-          a avaliação de Boas Práticas em serviços de alimentação, transformando
-          checklists sanitários em relatórios claros e acionáveis para
-          consultores e responsáveis técnicos.
+          digital desenvolvido na Universidade Federal Fluminense que automatiza
+          a avaliação de boas práticas em serviços de alimentação. Com seu
+          motor de pontuação por risco sanitário, classifica automaticamente
+          os estabelecimentos nas categorias A, B, C ou Pendente — transformando
+          checklists em relatórios de conformidade imediatos e rastreáveis.
         </p>
 
         {/* Buttons */}

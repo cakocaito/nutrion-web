@@ -63,10 +63,11 @@ export default function HomePage() {
       .finally(() => setLoadingMetrics(false));
   }, []);
 
-  const total = avaliacoes.length;
-  const agendadas = avaliacoes.filter((a) => a.status === "Agendada").length;
-  const emAndamento = avaliacoes.filter((a) => a.status === "EmAndamento").length;
-  const concluidas = avaliacoes.filter((a) => a.status === "Concluida").length;
+  const ativas = avaliacoes.filter((a) => a.status !== "Cancelada");
+  const total = ativas.length;
+  const agendadas = ativas.filter((a) => a.status === "Agendada").length;
+  const emAndamento = ativas.filter((a) => a.status === "EmAndamento").length;
+  const concluidas = ativas.filter((a) => a.status === "Concluida").length;
 
   return (
     <div className="flex min-h-screen bg-[#f8fafb]">
