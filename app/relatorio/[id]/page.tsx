@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
 import { Sidebar, MobileSidebar, TopBar } from "@/app/projeto/components";
@@ -193,6 +193,11 @@ export default function RelatorioPage() {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [relatorio, setRelatorio] = useState<Relatorio | null>(null);
+
+  const dadosId = useMemo<DadosIdentificacao>(() => {
+    if (!relatorio?.dadosIdentificacao) return {};
+    try { return JSON.parse(relatorio.dadosIdentificacao); } catch { return {}; }
+  }, [relatorio?.dadosIdentificacao]);
   const [loading, setLoading] = useState(true);
   const [erro, setErro] = useState<string | null>(null);
   const [modalClassificacao, setModalClassificacao] = useState(false);
@@ -303,9 +308,6 @@ export default function RelatorioPage() {
 
               {/* ── Dados de Identificação ── */}
               {relatorio.dadosIdentificacao && (() => {
-                let dados: DadosIdentificacao = {};
-                try { dados = JSON.parse(relatorio.dadosIdentificacao); } catch { return null; }
-
                 const refeicaoLabel: Record<string, string> = {
                   "1": "Até 100", "2": "101 a 300", "3": "301 a 1000", "4": "1001 a 2500", "5": "Acima de 2500"
                 };
@@ -313,18 +315,17 @@ export default function RelatorioPage() {
                   "1": "Próprio", "6": "Terceirizado: Produção no local",
                   "7": "Comida transportada (cuba)", "8": "Comida transportada (embalada e porcionada)"
                 };
-
                 const funcionarios = [
-                  { label: "Nutricionista (diretora/vice)", valor: dados.nutriDiretora },
-                  { label: "Nutricionista (planejamento)", valor: dados.nutriPlanejamento },
-                  { label: "Nutricionista (produção)", valor: dados.nutriProducao },
-                  { label: "Estoquista", valor: dados.estoquista },
-                  { label: "Aux. estoquista", valor: dados.auxEstoquista },
-                  { label: "Chefe de cozinha", valor: dados.chefeCozinha },
-                  { label: "Cozinheiro", valor: dados.cozinheiro },
-                  { label: "Ajudante de cozinha", valor: dados.ajudanteCozinha },
-                  { label: "Copeira", valor: dados.copeira },
-                  { label: "Aux. serviços gerais", valor: dados.auxServicosGerais },
+                  { label: "Nutricionista (diretora/vice)", valor: dadosId.nutriDiretora },
+                  { label: "Nutricionista (planejamento)", valor: dadosId.nutriPlanejamento },
+                  { label: "Nutricionista (produção)", valor: dadosId.nutriProducao },
+                  { label: "Estoquista", valor: dadosId.estoquista },
+                  { label: "Aux. estoquista", valor: dadosId.auxEstoquista },
+                  { label: "Chefe de cozinha", valor: dadosId.chefeCozinha },
+                  { label: "Cozinheiro", valor: dadosId.cozinheiro },
+                  { label: "Ajudante de cozinha", valor: dadosId.ajudanteCozinha },
+                  { label: "Copeira", valor: dadosId.copeira },
+                  { label: "Aux. serviços gerais", valor: dadosId.auxServicosGerais },
                 ].filter(f => f.valor && f.valor !== "0" && f.valor.trim() !== "");
 
                 return (
@@ -334,14 +335,14 @@ export default function RelatorioPage() {
                     </div>
                     <div className="px-6 py-4">
                       <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-                        {dados.razaoSocial && <InfoItem label="Razão Social" valor={dados.razaoSocial} />}
-                        {dados.nomeFantasia && <InfoItem label="Nome Fantasia" valor={dados.nomeFantasia} />}
-                        {dados.endereco && <InfoItem label="Endereço" valor={dados.endereco} />}
-                        {dados.cep && <InfoItem label="CEP" valor={dados.cep} />}
-                        {dados.telefone && <InfoItem label="Telefone" valor={dados.telefone} />}
-                        {dados.email && <InfoItem label="E-mail" valor={dados.email} />}
-                        {dados.refeicoesDia && <InfoItem label="Refeições/dia" valor={refeicaoLabel[dados.refeicoesDia] ?? dados.refeicoesDia} />}
-                        {dados.tipoServico && <InfoItem label="Tipo de serviço" valor={servicoLabel[dados.tipoServico] ?? dados.tipoServico} />}
+                        {dadosId.razaoSocial && <InfoItem label="Razão Social" valor={dadosId.razaoSocial} />}
+                        {dadosId.nomeFantasia && <InfoItem label="Nome Fantasia" valor={dadosId.nomeFantasia} />}
+                        {dadosId.endereco && <InfoItem label="Endereço" valor={dadosId.endereco} />}
+                        {dadosId.cep && <InfoItem label="CEP" valor={dadosId.cep} />}
+                        {dadosId.telefone && <InfoItem label="Telefone" valor={dadosId.telefone} />}
+                        {dadosId.email && <InfoItem label="E-mail" valor={dadosId.email} />}
+                        {dadosId.refeicoesDia && <InfoItem label="Refeições/dia" valor={refeicaoLabel[dadosId.refeicoesDia] ?? dadosId.refeicoesDia} />}
+                        {dadosId.tipoServico && <InfoItem label="Tipo de serviço" valor={servicoLabel[dadosId.tipoServico] ?? dadosId.tipoServico} />}
                       </div>
                       {funcionarios.length > 0 && (
                         <div className="mt-4">
