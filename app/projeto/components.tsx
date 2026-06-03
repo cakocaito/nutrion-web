@@ -974,7 +974,10 @@ export function ProjectCard({
       )}
 
       <div className="mt-4 flex items-center justify-between text-[12px] text-[#6b7280]">
-        <span>{date}</span>
+        <div className="flex items-center gap-2">
+          <span>{date}</span>
+          {id && <span className="rounded-md bg-[#f1f8fc] px-2 py-0.5 font-mono text-[11px] font-semibold text-[#0f62ac]">#{id}</span>}
+        </div>
         <div className="flex items-center gap-2">
           {(status === "agendada" || status === "em_andamento") && id && (
             <a

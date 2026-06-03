@@ -307,7 +307,7 @@ export default function RelatorioPage() {
               </div>
 
               {/* ── Dados de Identificação ── */}
-              {relatorio.dadosIdentificacao && (() => {
+              {relatorio.dadosIdentificacao && Object.values(dadosId).some(v => v && v.trim() !== "") && (() => {
                 const refeicaoLabel: Record<string, string> = {
                   "1": "Até 100", "2": "101 a 300", "3": "301 a 1000", "4": "1001 a 2500", "5": "Acima de 2500"
                 };
