@@ -58,7 +58,14 @@ export default function Login() {
       setUser(user);
       // mantém loading até a navegação acontecer via useEffect
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : "Erro ao fazer login.");
+      const msg = err instanceof Error ? err.message : "";
+      if (msg.toLowerCase().includes("fetch") || msg.toLowerCase().includes("network")) {
+        setError("Não foi possível conectar ao servidor. Verifique sua conexão e tente novamente.");
+      } else if (msg.toLowerCase().includes("inválido") || msg.toLowerCase().includes("invalid") || msg.toLowerCase().includes("401")) {
+        setError("E-mail ou senha incorretos.");
+      } else {
+        setError(msg || "Erro ao fazer login. Tente novamente.");
+      }
       setLoading(false);
     }
   }
