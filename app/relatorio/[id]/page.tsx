@@ -27,6 +27,28 @@ interface RelatorioSecao {
   itens: ItemSecao[];
 }
 
+interface DadosIdentificacao {
+  razaoSocial?: string;
+  nomeFantasia?: string;
+  data?: string;
+  endereco?: string;
+  cep?: string;
+  telefone?: string;
+  email?: string;
+  refeicoesDia?: string;
+  tipoServico?: string;
+  nutriDiretora?: string;
+  nutriPlanejamento?: string;
+  nutriProducao?: string;
+  estoquista?: string;
+  auxEstoquista?: string;
+  chefeCozinha?: string;
+  cozinheiro?: string;
+  ajudanteCozinha?: string;
+  copeira?: string;
+  auxServicosGerais?: string;
+}
+
 interface Relatorio {
   id: number;
   pontuacaoTotal: number;
@@ -34,6 +56,7 @@ interface Relatorio {
   cumpriuEliminatorios: boolean;
   cumpriuClassificatorios: boolean;
   propostaIntervencao: string | null;
+  dadosIdentificacao: string | null;
   dataGeracao: string;
   estabelecimentoNome: string;
   dataAvaliacao: string;
@@ -142,6 +165,15 @@ function ClassificacaoModal({ onClose }: { onClose: () => void }) {
   );
 }
 
+function InfoItem({ label, valor }: { label: string; valor: string }) {
+  return (
+    <div>
+      <p className="text-[11px] font-medium uppercase tracking-wide text-[#9ca3af]">{label}</p>
+      <p className="text-[13px] font-semibold text-[#2e2e2e]">{valor}</p>
+    </div>
+  );
+}
+
 /* ── Section title with blue underline (matches PDF style) ── */
 function SectionTitle({ children }: { children: React.ReactNode }) {
   return (
@@ -225,7 +257,12 @@ export default function RelatorioPage() {
             @media print {
               .no-print { display: none !important; }
               body { background: white !important; }
-              .print-area { margin-left: 0 !important; }
+              .print-area { margin-left: 0 !important; width: 100% !important; }
+              * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+              .print-section { page-break-inside: avoid; break-inside: avoid; }
+              .print-page-break { page-break-before: always; break-before: always; }
+              @page { margin: 15mm 12mm; size: A4; }
+              h1, h2, h3 { page-break-after: avoid; break-after: avoid; }
             }
           `}</style>
 
@@ -263,6 +300,68 @@ export default function RelatorioPage() {
                   </div>
                 </div>
               </div>
+
+              {/* ── Dados de Identificação ── */}
+              {relatorio.dadosIdentificacao && (() => {
+                let dados: DadosIdentificacao = {};
+                try { dados = JSON.parse(relatorio.dadosIdentificacao); } catch { return null; }
+
+                const refeicaoLabel: Record<string, string> = {
+                  "1": "Até 100", "2": "101 a 300", "3": "301 a 1000", "4": "1001 a 2500", "5": "Acima de 2500"
+                };
+                const servicoLabel: Record<string, string> = {
+                  "1": "Próprio", "6": "Terceirizado: Produção no local",
+                  "7": "Comida transportada (cuba)", "8": "Comida transportada (embalada e porcionada)"
+                };
+
+                const funcionarios = [
+                  { label: "Nutricionista (diretora/vice)", valor: dados.nutriDiretora },
+                  { label: "Nutricionista (planejamento)", valor: dados.nutriPlanejamento },
+                  { label: "Nutricionista (produção)", valor: dados.nutriProducao },
+                  { label: "Estoquista", valor: dados.estoquista },
+                  { label: "Aux. estoquista", valor: dados.auxEstoquista },
+                  { label: "Chefe de cozinha", valor: dados.chefeCozinha },
+                  { label: "Cozinheiro", valor: dados.cozinheiro },
+                  { label: "Ajudante de cozinha", valor: dados.ajudanteCozinha },
+                  { label: "Copeira", valor: dados.copeira },
+                  { label: "Aux. serviços gerais", valor: dados.auxServicosGerais },
+                ].filter(f => f.valor && f.valor !== "0" && f.valor.trim() !== "");
+
+                return (
+                  <div className="print-section overflow-hidden rounded-2xl bg-white">
+                    <div className="border-b border-[#e2e8f0] px-6 py-4">
+                      <SectionTitle>Identificação do Estabelecimento</SectionTitle>
+                    </div>
+                    <div className="px-6 py-4">
+                      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                        {dados.razaoSocial && <InfoItem label="Razão Social" valor={dados.razaoSocial} />}
+                        {dados.nomeFantasia && <InfoItem label="Nome Fantasia" valor={dados.nomeFantasia} />}
+                        {dados.endereco && <InfoItem label="Endereço" valor={dados.endereco} />}
+                        {dados.cep && <InfoItem label="CEP" valor={dados.cep} />}
+                        {dados.telefone && <InfoItem label="Telefone" valor={dados.telefone} />}
+                        {dados.email && <InfoItem label="E-mail" valor={dados.email} />}
+                        {dados.refeicoesDia && <InfoItem label="Refeições/dia" valor={refeicaoLabel[dados.refeicoesDia] ?? dados.refeicoesDia} />}
+                        {dados.tipoServico && <InfoItem label="Tipo de serviço" valor={servicoLabel[dados.tipoServico] ?? dados.tipoServico} />}
+                      </div>
+                      {funcionarios.length > 0 && (
+                        <div className="mt-4">
+                          <p className="mb-2 text-[12px] font-semibold uppercase tracking-wider text-[#6b7280]">
+                            Quadro de Funcionários
+                          </p>
+                          <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
+                            {funcionarios.map(f => (
+                              <div key={f.label} className="rounded-lg bg-[#f8fafb] px-3 py-2">
+                                <p className="text-[11px] text-[#6b7280]">{f.label}</p>
+                                <p className="text-[13px] font-semibold text-[#2e2e2e]">{f.valor}</p>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                );
+              })()}
 
               {/* ── Análise Geral (PDF "Resumo" style) ── */}
               <div className="overflow-hidden rounded-2xl bg-white">
@@ -367,7 +466,7 @@ export default function RelatorioPage() {
                   return (
                     <div
                       key={s.secao}
-                      className={`overflow-hidden rounded-2xl bg-white ${
+                      className={`print-section overflow-hidden rounded-2xl bg-white ${
                         emphasis === "high"
                           ? "ring-2 ring-red-200"
                           : emphasis === "medium"
