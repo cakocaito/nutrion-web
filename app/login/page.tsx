@@ -21,6 +21,10 @@ export default function Login() {
   const [recuperarMsg, setRecuperarMsg] = useState("");
 
   useEffect(() => {
+    router.prefetch("/home");
+  }, [router]);
+
+  useEffect(() => {
     if (user) router.replace("/home");
   }, [user, router]);
 
@@ -52,9 +56,9 @@ export default function Login() {
     try {
       const user = await login(email, password);
       setUser(user);
+      // mantém loading até a navegação acontecer via useEffect
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : "Erro ao fazer login.");
-    } finally {
       setLoading(false);
     }
   }
