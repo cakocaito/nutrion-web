@@ -261,7 +261,7 @@ export function Sidebar({
         </div>
         {!collapsed && (
           <span className="font-[family-name:var(--font-heading)] text-[15px] font-bold text-[#2e2e2e]">
-            NutriSec
+            NutriSec UFF
           </span>
         )}
       </div>
@@ -391,7 +391,7 @@ export function MobileSidebar({
             <span className="text-xs font-bold text-white">uff</span>
           </div>
           <span className="font-[family-name:var(--font-heading)] text-[15px] font-bold text-[#2e2e2e]">
-            NutriSec
+            NutriSec UFF
           </span>
         </div>
 
@@ -704,7 +704,7 @@ export function TopBar({
 
                 {SUPORTE_WHATSAPP && (
                   <a
-                    href={`https://wa.me/${SUPORTE_WHATSAPP}?text=Olá,%20preciso%20de%20suporte%20no%20NutriSec`}
+                    href={`https://wa.me/${SUPORTE_WHATSAPP}?text=Olá,%20preciso%20de%20suporte%20no%20NutriSec UFF`}
                     target="_blank"
                     rel="noopener noreferrer"
                     onClick={() => setDropdownOpen(false)}

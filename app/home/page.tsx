@@ -98,7 +98,7 @@ export default function HomePage() {
                 Olá, {firstName} 👋
               </h1>
               <p className="mt-0.5 text-[14px] text-[#6b7280]">
-                Bem-vindo ao NutriSec — Sistema de avaliação de segurança alimentar
+                Bem-vindo ao NutriSec UFF — Sistema de avaliação de segurança alimentar
               </p>
             </div>
             <button
@@ -131,7 +131,7 @@ export default function HomePage() {
                 sendo o checklist um instrumento essencial para avaliar não conformidades e riscos sanitários.
               </p>
               <p className="mt-3 text-[14px] leading-relaxed text-[#4b5563]">
-                O <span className="font-semibold text-[#2e2e2e]">NutriSec</span> é um sistema digital de
+                O <span className="font-semibold text-[#2e2e2e]">NutriSec UFF</span> é um sistema digital de
                 avaliação desenvolvido para os serviços de alimentação da Universidade Federal Fluminense.
               </p>
 

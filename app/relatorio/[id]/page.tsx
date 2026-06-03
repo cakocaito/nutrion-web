@@ -207,7 +207,10 @@ export default function RelatorioPage() {
 
   useEffect(() => {
     apiFetch(`/api/avaliacoes/${id}/relatorio`)
-      .then(setRelatorio)
+      .then((r) => {
+        setRelatorio(r);
+        document.title = `NutriSec UFF UFF - ${r.estabelecimentoNome} - ${new Date(r.dataAvaliacao).toLocaleDateString("pt-BR")}`;
+      })
       .catch((e) => setErro(e?.message ?? "Erro ao carregar relatório."))
       .finally(() => setLoading(false));
   }, [id]);
@@ -775,7 +778,7 @@ export default function RelatorioPage() {
 
               {/* ── Footer ── */}
               <p className="pb-4 text-center text-[11px] text-[#a0aec0]">
-                Relatório gerado em {new Date(relatorio.dataGeracao).toLocaleDateString("pt-BR")} · NutriSec — Sistema de avaliação de segurança alimentar
+                Relatório gerado em {new Date(relatorio.dataGeracao).toLocaleDateString("pt-BR")} · NutriSec UFF — Sistema de avaliação de segurança alimentar
               </p>
             </div>
           )}

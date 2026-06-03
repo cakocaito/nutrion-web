@@ -41,20 +41,20 @@ const passos = [
     numero: 2,
     titulo: "Entre em contato com o administrador",
     descricao:
-      "Para acessar o projeto NutriSec no REDCap Mobile, você precisa de um token de acesso. Solicite ao administrador do sistema — ele liberará o token específico do projeto para você.",
+      "Para acessar o projeto NutriSec UFF no REDCap Mobile, você precisa de um token de acesso. Solicite ao administrador do sistema — ele liberará o token específico do projeto para você.",
     destaque: "Sem o token, não é possível baixar o projeto no aplicativo.",
   },
   {
     numero: 3,
     titulo: "Adicione o projeto no app",
     descricao:
-      "Abra o REDCap Mobile, toque em \"Novo projeto\" e insira o token fornecido pelo administrador. O projeto NutriSec será baixado para o seu dispositivo e ficará disponível offline.",
+      "Abra o REDCap Mobile, toque em \"Novo projeto\" e insira o token fornecido pelo administrador. O projeto NutriSec UFF será baixado para o seu dispositivo e ficará disponível offline.",
   },
   {
     numero: 4,
     titulo: "Crie um novo registro",
     descricao:
-      "Dentro do projeto, toque em \"Novo registro\" para iniciar o preenchimento do checklist. No campo id_pesquisa, insira o código gerado pelo NutriSec para a avaliação correspondente.",
+      "Dentro do projeto, toque em \"Novo registro\" para iniciar o preenchimento do checklist. No campo id_pesquisa, insira o código gerado pelo NutriSec UFF para a avaliação correspondente.",
     destaque: "O id_pesquisa é essencial — sem ele o sistema não consegue vincular o checklist ao estabelecimento correto.",
   },
   {
@@ -73,7 +73,7 @@ const passos = [
     numero: 7,
     titulo: "Aguarde o relatório",
     descricao:
-      "O NutriSec sincroniza com o REDCap automaticamente a cada 5 minutos. Após o envio, o relatório com a classificação do estabelecimento será gerado e ficará disponível no sistema em até 10 minutos.",
+      "O NutriSec UFF sincroniza com o REDCap automaticamente a cada 5 minutos. Após o envio, o relatório com a classificação do estabelecimento será gerado e ficará disponível no sistema em até 10 minutos.",
   },
 ];
 
@@ -104,7 +104,7 @@ export default function RedcapPage() {
               Como usar o REDCap Mobile
             </h1>
             <p className="mt-0.5 text-[14px] text-[#6b7280]">
-              Passo a passo para aplicar o checklist NutriSec em campo
+              Passo a passo para aplicar o checklist NutriSec UFF em campo
             </p>
 
             <div className="mt-6 space-y-3">

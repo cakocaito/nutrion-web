@@ -56,14 +56,14 @@ export default function SobrePage() {
             <div className="flex size-[36px] items-center justify-center rounded-md bg-[#0f62ac]">
               <Image
                 src="/images/uff-logo.png"
-                alt="NutriSec"
+                alt="NutriSec UFF"
                 width={28}
                 height={14}
                 className="h-[14px] w-[28px] object-contain brightness-0 invert"
               />
             </div>
             <span className="font-[family-name:var(--font-heading)] text-[18px] font-bold tracking-tight text-[#2e2e2e]">
-              NutriSec
+              NutriSec UFF
             </span>
           </Link>
           <span className="text-[14px] font-semibold text-[#2e2e2e]">
@@ -76,7 +76,7 @@ export default function SobrePage() {
         {/* Hero section */}
         <div className="text-center">
           <h1 className="font-[family-name:var(--font-heading)] text-[28px] font-bold leading-tight tracking-[-1px] text-[#2e2e2e] sm:text-[36px] sm:tracking-[-1.5px]">
-            Sobre o <span className="text-[#0f62ac]">NutriSec</span>
+            Sobre o <span className="text-[#0f62ac]">NutriSec UFF</span>
           </h1>
           <p className="mx-auto mt-3 max-w-[640px] text-[14px] leading-relaxed text-[#6b7280] sm:text-[15px]">
             Sistema digital de avaliação de segurança alimentar desenvolvido na
@@ -102,7 +102,7 @@ export default function SobrePage() {
             não conformidades e riscos sanitários em serviços de alimentação.
           </p>
           <p className="mt-4 text-[14px] leading-relaxed text-[#4b5563] sm:text-[15px]">
-            O <span className="font-semibold text-[#2e2e2e]">NutriSec</span> é
+            O <span className="font-semibold text-[#2e2e2e]">NutriSec UFF</span> é
             um sistema digital de avaliação desenvolvido para os serviços de
             alimentação da Universidade Federal Fluminense. Ele permite que
             consultores realizem avaliações de Boas Práticas utilizando

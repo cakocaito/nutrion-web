@@ -94,7 +94,7 @@ export default function LandingPage() {
         {/* Description paragraph */}
         <p className="mt-8 max-w-[785px] text-[15px] font-medium leading-[1.4] tracking-[-0.34px] text-[#2e2e2e]/80 sm:text-[17px]">
           As Doenças de Transmissão Hídrica e Alimentar representam um dos
-          maiores desafios de saúde pública no mundo. O NutriSec é um sistema
+          maiores desafios de saúde pública no mundo. O NutriSec UFF é um sistema
           digital desenvolvido na Universidade Federal Fluminense que automatiza
           a avaliação de boas práticas em serviços de alimentação. Com seu
           motor de pontuação por risco sanitário, classifica automaticamente

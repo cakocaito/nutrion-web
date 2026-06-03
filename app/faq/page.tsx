@@ -9,9 +9,9 @@ const faqs = [
     categoria: "Sobre o sistema",
     itens: [
       {
-        pergunta: "O que é o NutriSec?",
+        pergunta: "O que é o NutriSec UFF?",
         resposta:
-          "O NutriSec é um sistema digital de avaliação de boas práticas em serviços de alimentação, desenvolvido por alunos do Instituto de Computação da UFF em parceria com a Faculdade de Nutrição. Ele digitaliza o processo de aplicação do checklist sanitário, integrando com o REDCap para coleta dos dados.",
+          "O NutriSec UFF é um sistema digital de avaliação de boas práticas em serviços de alimentação, desenvolvido por alunos do Instituto de Computação da UFF em parceria com a Faculdade de Nutrição. Ele digitaliza o processo de aplicação do checklist sanitário, integrando com o REDCap para coleta dos dados.",
       },
       {
         pergunta: "Quem pode usar o sistema?",
@@ -21,7 +21,7 @@ const faqs = [
       {
         pergunta: "O sistema funciona em celular?",
         resposta:
-          "Sim. O NutriSec é responsivo e pode ser acessado pelo navegador do celular ou tablet, com sidebar adaptada para telas menores.",
+          "Sim. O NutriSec UFF é responsivo e pode ser acessado pelo navegador do celular ou tablet, com sidebar adaptada para telas menores.",
       },
     ],
   },
@@ -36,7 +36,7 @@ const faqs = [
       {
         pergunta: "O que é o id_pesquisa?",
         resposta:
-          "É o identificador único da avaliação gerado pelo NutriSec. Deve ser preenchido no campo 'id_pesquisa' do formulário REDCap durante a aplicação do checklist. Sem esse código, o sistema não consegue vincular os dados ao estabelecimento correto.",
+          "É o identificador único da avaliação gerado pelo NutriSec UFF. Deve ser preenchido no campo 'id_pesquisa' do formulário REDCap durante a aplicação do checklist. Sem esse código, o sistema não consegue vincular os dados ao estabelecimento correto.",
       },
       {
         pergunta: "Quanto tempo leva para o relatório aparecer após preencher o REDCap?",
@@ -155,7 +155,7 @@ export default function FaqPage() {
               Perguntas frequentes
             </h1>
             <p className="mt-0.5 text-[14px] text-[#6b7280]">
-              Tire suas dúvidas sobre o NutriSec
+              Tire suas dúvidas sobre o NutriSec UFF
             </p>
 
             <div className="mt-6 space-y-4">

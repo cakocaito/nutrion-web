@@ -95,14 +95,14 @@ function TermsModal({ onAccept }: { onAccept: () => void }) {
           <div>
             <p className="font-semibold text-[#2e2e2e]">1. Sobre o sistema</p>
             <p className="mt-1">
-              O NutriSec é um sistema digital de avaliação de boas práticas em serviços de alimentação, desenvolvido no âmbito de pesquisa da Universidade Federal Fluminense (UFF). Seu uso é restrito a usuários autorizados vinculados ao projeto.
+              O NutriSec UFF é um sistema digital de avaliação de boas práticas em serviços de alimentação, desenvolvido no âmbito de pesquisa da Universidade Federal Fluminense (UFF). Seu uso é restrito a usuários autorizados vinculados ao projeto.
             </p>
           </div>
 
           <div>
             <p className="font-semibold text-[#2e2e2e]">2. Coleta e uso de dados</p>
             <p className="mt-1">
-              Os dados coletados — incluindo nome completo, e-mail, CPF e informações sobre estabelecimentos avaliados — são utilizados exclusivamente para fins de pesquisa científica e avaliação sanitária no contexto do projeto NutriSec. Nenhum dado é compartilhado com terceiros sem consentimento explícito.
+              Os dados coletados — incluindo nome completo, e-mail, CPF e informações sobre estabelecimentos avaliados — são utilizados exclusivamente para fins de pesquisa científica e avaliação sanitária no contexto do projeto NutriSec UFF. Nenhum dado é compartilhado com terceiros sem consentimento explícito.
             </p>
           </div>
 
@@ -139,7 +139,7 @@ function TermsModal({ onAccept }: { onAccept: () => void }) {
             />
             <span className="text-[13px] text-[#4b5563]">
               Li e aceito os <span className="font-semibold text-[#2e2e2e]">Termos de Uso</span> e a{" "}
-              <span className="font-semibold text-[#2e2e2e]">Política de Privacidade</span> do NutriSec.
+              <span className="font-semibold text-[#2e2e2e]">Política de Privacidade</span> do NutriSec UFF.
             </span>
           </label>
 
