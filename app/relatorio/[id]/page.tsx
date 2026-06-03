@@ -28,25 +28,25 @@ interface RelatorioSecao {
 }
 
 interface DadosIdentificacao {
-  razaoSocial?: string;
-  nomeFantasia?: string;
-  data?: string;
-  endereco?: string;
-  cep?: string;
-  telefone?: string;
-  email?: string;
-  refeicoesDia?: string;
-  tipoServico?: string;
-  nutriDiretora?: string;
-  nutriPlanejamento?: string;
-  nutriProducao?: string;
-  estoquista?: string;
-  auxEstoquista?: string;
-  chefeCozinha?: string;
-  cozinheiro?: string;
-  ajudanteCozinha?: string;
-  copeira?: string;
-  auxServicosGerais?: string;
+  RazaoSocial?: string;
+  NomeFantasia?: string;
+  Data?: string;
+  Endereco?: string;
+  CEP?: string;
+  Telefone?: string;
+  Email?: string;
+  RefeicoesDia?: string;
+  TipoServico?: string;
+  NutriDiretora?: string;
+  NutriPlanejamento?: string;
+  NutriProducao?: string;
+  Estoquista?: string;
+  AuxEstoquista?: string;
+  ChefeCozinha?: string;
+  Cozinheiro?: string;
+  AjudanteCozinha?: string;
+  Copeira?: string;
+  AuxServicosGerais?: string;
 }
 
 interface Relatorio {
@@ -316,16 +316,16 @@ export default function RelatorioPage() {
                   "7": "Comida transportada (cuba)", "8": "Comida transportada (embalada e porcionada)"
                 };
                 const funcionarios = [
-                  { label: "Nutricionista (diretora/vice)", valor: dadosId.nutriDiretora },
-                  { label: "Nutricionista (planejamento)", valor: dadosId.nutriPlanejamento },
-                  { label: "Nutricionista (produção)", valor: dadosId.nutriProducao },
-                  { label: "Estoquista", valor: dadosId.estoquista },
-                  { label: "Aux. estoquista", valor: dadosId.auxEstoquista },
-                  { label: "Chefe de cozinha", valor: dadosId.chefeCozinha },
-                  { label: "Cozinheiro", valor: dadosId.cozinheiro },
-                  { label: "Ajudante de cozinha", valor: dadosId.ajudanteCozinha },
-                  { label: "Copeira", valor: dadosId.copeira },
-                  { label: "Aux. serviços gerais", valor: dadosId.auxServicosGerais },
+                  { label: "Nutricionista (diretora/vice)", valor: dadosId.NutriDiretora },
+                  { label: "Nutricionista (planejamento)", valor: dadosId.NutriPlanejamento },
+                  { label: "Nutricionista (produção)", valor: dadosId.NutriProducao },
+                  { label: "Estoquista", valor: dadosId.Estoquista },
+                  { label: "Aux. estoquista", valor: dadosId.AuxEstoquista },
+                  { label: "Chefe de cozinha", valor: dadosId.ChefeCozinha },
+                  { label: "Cozinheiro", valor: dadosId.Cozinheiro },
+                  { label: "Ajudante de cozinha", valor: dadosId.AjudanteCozinha },
+                  { label: "Copeira", valor: dadosId.Copeira },
+                  { label: "Aux. serviços gerais", valor: dadosId.AuxServicosGerais },
                 ].filter(f => f.valor && f.valor !== "0" && f.valor.trim() !== "");
 
                 return (
@@ -335,14 +335,14 @@ export default function RelatorioPage() {
                     </div>
                     <div className="px-6 py-4">
                       <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-                        {dadosId.razaoSocial && <InfoItem label="Razão Social" valor={dadosId.razaoSocial} />}
-                        {dadosId.nomeFantasia && <InfoItem label="Nome Fantasia" valor={dadosId.nomeFantasia} />}
-                        {dadosId.endereco && <InfoItem label="Endereço" valor={dadosId.endereco} />}
-                        {dadosId.cep && <InfoItem label="CEP" valor={dadosId.cep} />}
-                        {dadosId.telefone && <InfoItem label="Telefone" valor={dadosId.telefone} />}
-                        {dadosId.email && <InfoItem label="E-mail" valor={dadosId.email} />}
-                        {dadosId.refeicoesDia && <InfoItem label="Refeições/dia" valor={refeicaoLabel[dadosId.refeicoesDia] ?? dadosId.refeicoesDia} />}
-                        {dadosId.tipoServico && <InfoItem label="Tipo de serviço" valor={servicoLabel[dadosId.tipoServico] ?? dadosId.tipoServico} />}
+                        {dadosId.RazaoSocial && <InfoItem label="Razão Social" valor={dadosId.RazaoSocial} />}
+                        {dadosId.NomeFantasia && <InfoItem label="Nome Fantasia" valor={dadosId.NomeFantasia} />}
+                        {dadosId.Endereco && <InfoItem label="Endereço" valor={dadosId.Endereco} />}
+                        {dadosId.CEP && <InfoItem label="CEP" valor={dadosId.CEP} />}
+                        {dadosId.Telefone && <InfoItem label="Telefone" valor={dadosId.Telefone} />}
+                        {dadosId.Email && <InfoItem label="E-mail" valor={dadosId.Email} />}
+                        {dadosId.RefeicoesDia && <InfoItem label="Refeições/dia" valor={refeicaoLabel[dadosId.RefeicoesDia] ?? dadosId.RefeicoesDia} />}
+                        {dadosId.TipoServico && <InfoItem label="Tipo de serviço" valor={servicoLabel[dadosId.TipoServico] ?? dadosId.TipoServico} />}
                       </div>
                       {funcionarios.length > 0 && (
                         <div className="mt-4">
