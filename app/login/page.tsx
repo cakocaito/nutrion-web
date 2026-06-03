@@ -142,7 +142,11 @@ export default function Login() {
             <button
               onClick={handleLogin}
               disabled={loading}
-              className="h-[50px] w-full rounded-full border border-[#9e9e9e]/24 bg-white text-[15px] font-semibold text-[#a3b5bf] transition-colors hover:border-[#0f62ac]/30 hover:text-[#0f62ac] disabled:opacity-50 sm:h-[55px] sm:text-[17px]"
+              className={`h-[50px] w-full rounded-full text-[15px] font-semibold transition-colors disabled:opacity-50 sm:h-[55px] sm:text-[17px] ${
+                email && password
+                  ? "bg-[#0f62ac] text-white hover:bg-[#0f62ac]/90"
+                  : "border border-[#9e9e9e]/24 bg-white text-[#a3b5bf] hover:border-[#0f62ac]/30 hover:text-[#0f62ac]"
+              }`}
             >
               {loading ? "Entrando..." : "Continuar"}
             </button>
