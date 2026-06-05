@@ -26,16 +26,25 @@ const AuthContext = createContext<AuthContextType>({
 });
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [user, setUser] = useState<AuthUser | null>(null);
+  const [user, setUserState] = useState<AuthUser | null>(null);
   const [termsAccepted, setTermsAccepted] = useState(false);
 
   useEffect(() => {
     const u = getUser();
-    setUser(u);
     if (u) {
+      setUserState(u);
       setTermsAccepted(localStorage.getItem(termsKey(u.email)) === "true");
     }
   }, []);
+
+  function setUser(newUser: AuthUser | null) {
+    setUserState(newUser);
+    if (newUser) {
+      setTermsAccepted(localStorage.getItem(termsKey(newUser.email)) === "true");
+    } else {
+      setTermsAccepted(false);
+    }
+  }
 
   function logout() {
     doLogout();
