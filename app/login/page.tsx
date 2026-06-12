@@ -56,7 +56,7 @@ export default function Login() {
     try {
       const user = await login(email, password);
       setUser(user);
-      // mantém loading até a navegação acontecer via useEffect
+      router.replace("/home");
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : "";
       if (msg.toLowerCase().includes("fetch") || msg.toLowerCase().includes("network")) {
