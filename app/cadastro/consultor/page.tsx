@@ -122,6 +122,7 @@ export default function CadastroConsultor() {
       });
       const user = await login(form.email, form.password);
       setUser(user);
+      router.replace("/home");
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : "Erro ao cadastrar.");
     } finally {

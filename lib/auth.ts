@@ -29,7 +29,14 @@ export function logout() {
 export function getUser(): AuthUser | null {
   if (typeof window === "undefined") return null;
   const raw = localStorage.getItem("user");
-  return raw ? JSON.parse(raw) : null;
+  if (!raw) return null;
+  const user: AuthUser = JSON.parse(raw);
+  if (new Date(user.expiration) <= new Date()) {
+    localStorage.removeItem("user");
+    localStorage.removeItem("token");
+    return null;
+  }
+  return user;
 }
 
 export function isAuthenticated(): boolean {
