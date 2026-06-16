@@ -217,7 +217,7 @@ export default function HomePage() {
                 {pesquisadores.map((p) => (
                   <div key={p.nome} className="rounded-xl bg-[#f8fafb] px-3 py-2.5">
                     <p className="text-[13px] font-semibold leading-snug text-[#2e2e2e]">{p.nome}</p>
-                    <p className="mt-0.5 text-[11px] text-[#9ca3af]">Fac. de {p.faculdade}</p>
+                    <p className="mt-0.5 text-[11px] text-[#9ca3af]">Instituto de {p.faculdade}</p>
                   </div>
                 ))}
               </div>

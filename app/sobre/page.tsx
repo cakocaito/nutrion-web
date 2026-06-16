@@ -269,7 +269,7 @@ export default function SobrePage() {
                   {p.nome}
                 </p>
                 <p className="mt-0.5 text-[11px] text-[#9ca3af]">
-                  Fac. de {p.faculdade}
+                  Instituto de {p.faculdade}
                 </p>
               </div>
             ))}
