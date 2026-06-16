@@ -254,13 +254,13 @@ export default function SobrePage() {
           </div>
         </section>
 
-        {/* Pesquisadores */}
+        {/* Autores do estudo */}
         <section className="mt-4 rounded-2xl border border-[#e5eaf0] bg-white p-6">
           <p className="text-[11px] font-semibold uppercase tracking-widest text-[#0f62ac]">
-            Pesquisadores envolvidos
+            Autores do estudo
           </p>
           <p className="mt-1 text-[12px] text-[#9ca3af]">
-            Autores do estudo publicado na Revista PIBIC UFF 2024
+            Trabalho apresentado no PIBIC UFF 2024
           </p>
           <div className="mt-4 grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-4">
             {pesquisadores.map((p) => (

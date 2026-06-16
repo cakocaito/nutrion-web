@@ -207,12 +207,12 @@ export default function HomePage() {
               </div>
             </div>
 
-            {/* Pesquisadores envolvidos — largura total */}
+            {/* Autores do estudo — largura total */}
             <div className="rounded-2xl border border-[#e5eaf0] bg-white p-6 lg:col-span-3">
               <p className="text-[11px] font-semibold uppercase tracking-widest text-[#0f62ac]">
-                Pesquisadores envolvidos
+                Autores do estudo
               </p>
-              <p className="mt-1 text-[12px] text-[#9ca3af]">Autores do estudo publicado na Revista PIBIC UFF 2024</p>
+              <p className="mt-1 text-[12px] text-[#9ca3af]">Trabalho apresentado no PIBIC UFF 2024</p>
               <div className="mt-4 grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-4">
                 {pesquisadores.map((p) => (
                   <div key={p.nome} className="rounded-xl bg-[#f8fafb] px-3 py-2.5">
