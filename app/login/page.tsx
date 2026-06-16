@@ -53,20 +53,41 @@ export default function Login() {
     if (passErr) { setError(passErr); return; }
 
     setLoading(true);
-    try {
+
+    const attempt = async () => {
       const user = await login(email, password);
       setUser(user);
       router.replace("/home");
+    };
+
+    try {
+      await attempt();
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : "";
-      if (msg.toLowerCase().includes("fetch") || msg.toLowerCase().includes("network")) {
-        setError("Não foi possível conectar ao servidor. Verifique sua conexão e tente novamente.");
-      } else if (msg.toLowerCase().includes("inválido") || msg.toLowerCase().includes("invalid") || msg.toLowerCase().includes("401")) {
-        setError("E-mail ou senha incorretos.");
+      const isConnectionError = msg.toLowerCase().includes("fetch") || msg.toLowerCase().includes("network") || msg.toLowerCase().includes("failed");
+      if (isConnectionError) {
+        try {
+          await new Promise(res => setTimeout(res, 10000));
+          await attempt();
+        } catch (err2: unknown) {
+          const msg2 = err2 instanceof Error ? err2.message : "";
+          if (msg2.toLowerCase().includes("fetch") || msg2.toLowerCase().includes("network") || msg2.toLowerCase().includes("failed")) {
+            setError("Não foi possível conectar ao servidor. Verifique sua conexão e tente novamente.");
+          } else if (msg2.toLowerCase().includes("inválido") || msg2.toLowerCase().includes("invalid") || msg2.toLowerCase().includes("401")) {
+            setError("E-mail ou senha incorretos.");
+          } else {
+            setError(msg2 || "Erro ao fazer login. Tente novamente.");
+          }
+          setLoading(false);
+        }
       } else {
-        setError(msg || "Erro ao fazer login. Tente novamente.");
+        if (msg.toLowerCase().includes("inválido") || msg.toLowerCase().includes("invalid") || msg.toLowerCase().includes("401")) {
+          setError("E-mail ou senha incorretos.");
+        } else {
+          setError(msg || "Erro ao fazer login. Tente novamente.");
+        }
+        setLoading(false);
       }
-      setLoading(false);
     }
   }
 
@@ -161,6 +182,7 @@ export default function Login() {
             >
               {loading ? "Entrando..." : "Continuar"}
             </button>
+
 
             <button
               type="button"

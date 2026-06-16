@@ -35,6 +35,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setUserState(u);
       setTermsAccepted(localStorage.getItem(termsKey(u.email)) === "true");
     }
+    // warm up the API container on app load (prevents cold start on login)
+    fetch(`${process.env.NEXT_PUBLIC_API_URL}/health`).catch(() => {});
   }, []);
 
   function setUser(newUser: AuthUser | null) {
