@@ -65,10 +65,10 @@ export default function PainelEmpreendimentos({
           <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <div>
               <h1 className="font-[family-name:var(--font-heading)] text-[22px] font-bold text-[#2e2e2e] sm:text-[26px]">
-                Empreendimentos
+                Estabelecimentos
               </h1>
               <p className="mt-1 text-[14px] font-medium text-[#6b7280]">
-                Gerencie os empreendimentos da sua empresa
+                Gerencie os estabelecimentos da sua empresa
               </p>
             </div>
             <div className="flex items-center gap-3">
@@ -111,7 +111,7 @@ export default function PainelEmpreendimentos({
                   </svg>
                 </div>
                 <span className="font-[family-name:var(--font-heading)] text-[14px] font-bold text-[#0f62ac]">
-                  Novo empreendimento
+                  Novo estabelecimento
                 </span>
               </button>
             </div>

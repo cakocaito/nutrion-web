@@ -219,7 +219,7 @@ function PainelResponsavel({ empresaId, onNovoEmpreendimento }: { empresaId: num
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <div>
               <h1 className="font-[family-name:var(--font-heading)] text-[22px] font-bold text-[#2e2e2e] sm:text-[26px]">
-                {aba === "avaliacoes" ? "Avaliações" : "Empreendimentos"}
+                {aba === "avaliacoes" ? "Avaliações" : "Estabelecimentos"}
               </h1>
               <p className="mt-0.5 text-[14px] text-[#6b7280]">
                 {aba === "avaliacoes"
@@ -240,14 +240,14 @@ function PainelResponsavel({ empresaId, onNovoEmpreendimento }: { empresaId: num
                 onClick={onNovoEmpreendimento}
                 className="inline-flex h-[38px] items-center gap-2 rounded-full bg-[#0f62ac] px-5 text-[13px] font-semibold text-white transition-colors hover:bg-[#0f62ac]/90"
               >
-                + Novo empreendimento
+                + Novo estabelecimento
               </button>
             )}
           </div>
 
           {/* Abas */}
           <div className="mt-4 flex gap-1 rounded-xl bg-[#f0f4f8] p-1 w-fit">
-            {([["avaliacoes", "Avaliações"], ["empreendimentos", "Empreendimentos"]] as const).map(([key, label]) => (
+            {([["avaliacoes", "Avaliações"], ["empreendimentos", "Estabelecimentos"]] as const).map(([key, label]) => (
               <button
                 key={key}
                 onClick={() => setAba(key)}
@@ -359,7 +359,7 @@ function EmpreendimentosLista({ empresaId, onNovoEmpreendimento }: { empresaId: 
             <line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" />
           </svg>
         </div>
-        <span className="text-[13px] font-bold text-[#0f62ac]">Novo empreendimento</span>
+        <span className="text-[13px] font-bold text-[#0f62ac]">Novo estabelecimento</span>
       </button>
     </div>
   );

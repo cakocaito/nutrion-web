@@ -89,7 +89,7 @@ export default function CadastrarEmpreendimento({
       setError(
         err instanceof Error
           ? err.message
-          : "Erro ao cadastrar empreendimento."
+          : "Erro ao cadastrar estabelecimento."
       );
     } finally {
       setLoading(false);
@@ -127,13 +127,13 @@ export default function CadastrarEmpreendimento({
           </div>
           <div>
             <h1 className="font-[family-name:var(--font-heading)] text-[20px] font-bold tracking-tight text-black sm:text-[24px]">NutriSec UFF</h1>
-            <p className="text-[14px] font-medium text-black/60 sm:text-[16px]">Novo empreendimento</p>
+            <p className="text-[14px] font-medium text-black/60 sm:text-[16px]">Novo estabelecimento</p>
           </div>
         </div>
 
         {/* Content */}
         <div className="mt-8 sm:mt-10">
-          <h2 className="font-[family-name:var(--font-heading)] text-[20px] font-bold tracking-tight text-black sm:text-[24px]">Cadastrar empreendimento</h2>
+          <h2 className="font-[family-name:var(--font-heading)] text-[20px] font-bold tracking-tight text-black sm:text-[24px]">Cadastrar estabelecimento</h2>
           <p className="mt-1 text-[14px] font-medium text-black/60 sm:text-[16px]">Preencha os dados do estabelecimento.</p>
 
           <div className="mt-5 flex flex-col gap-4 sm:mt-6 sm:gap-5">
@@ -161,7 +161,7 @@ export default function CadastrarEmpreendimento({
               disabled={loading}
               className="mt-2 h-[50px] w-full rounded-full border border-[#9e9e9e]/24 bg-white text-[15px] font-semibold text-[#a3b5bf] transition-colors hover:border-[#0f62ac]/30 hover:text-[#0f62ac] disabled:opacity-50 sm:h-[55px] sm:text-[17px]"
             >
-              {loading ? "Cadastrando..." : "Cadastrar empreendimento"}
+              {loading ? "Cadastrando..." : "Cadastrar estabelecimento"}
             </button>
           </div>
         </div>
